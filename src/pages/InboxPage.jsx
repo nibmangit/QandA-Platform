@@ -1,13 +1,13 @@
 import { useState, useMemo } from "react";
-import { Mail, List, PlusSquare } from "lucide-react";
+import { Mail, List, PlusSquare, ArrowUp } from "lucide-react";
 import { MOCK_MESSAGES } from "../utils/mock/mockData";
 import { findUser } from "../utils/Find";
 import { BDU } from "../utils/css";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext"; 
 
 const generateUUID = () => crypto.randomUUID().slice(0, 8);
 
-const InboxPage = () => {
+const InboxPage = () => { 
   const { currentUser } = useAuth();
   const conversations = useMemo(() => {
     const convMap = MOCK_MESSAGES.reduce((acc, msg) => {
@@ -109,8 +109,8 @@ const InboxPage = () => {
   );
 
   const MessageBubble = ({ message, isSender }) => {
-    const senderBg = BDU.ACCENT;
-    const receiverBg = "#3B89F6"; 
+    const senderBg = "#2563EB"; 
+    const receiverBg = "#1E40AF";
 
     return (
       <div className={`flex ${isSender ? "justify-end" : "justify-start"}`}>
@@ -120,7 +120,7 @@ const InboxPage = () => {
             px-4 py-2 rounded-2xl shadow-sm whitespace-pre-wrap 
             ${isSender 
               ? "text-white" 
-              : "text-gray-100 dark:text-gray-900 bg-gray-200 dark:bg-gray-700"}
+              : "text-gray-100 bg-gray-200 dark:bg-gray-700"}
           `}
           style={{
             backgroundColor: isSender ? senderBg : receiverBg,
@@ -147,7 +147,7 @@ const InboxPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto h-[90vh] py-10 px-4">
+    <div className="max-w-full mx-auto h-[90vh] py-10 px-4">
       {/* Title */}
       <h2 className="text-3xl font-bold mb-6 text-[#003366] dark:text-[#E6C25F]">
         <Mail size={28} className="inline mr-2" /> Private Messaging (Inbox)
@@ -189,11 +189,9 @@ const InboxPage = () => {
         {/* RIGHT PANEL - Chat */}
         <div className="flex-1 flex flex-col z-10 min-w-0">
           {activeConvData ? (
-            <>
-              {/* Header */}
+            <> 
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <div className="flex items-center">
-                  {/* Sidebar toggle (mobile) */}
+                <div className="flex items-center"> 
                   <button
                     onClick={() => setIsMobileSidebarOpen(true)}
                     className="md:hidden p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -201,7 +199,7 @@ const InboxPage = () => {
                     <List size={20} className="text-gray-700 dark:text-gray-200" />
                   </button>
 
-                  <img
+                  <img 
                     src={activeConvData.otherUser.avatar}
                     alt={activeConvData.otherUser.name}
                     className="h-10 w-10 rounded-full object-cover mr-3"
@@ -240,24 +238,18 @@ const InboxPage = () => {
                     focus:ring-1 focus:ring-[#2563EB] dark:focus:ring-[#3B82F6]
                     focus:border-[#2563EB] dark:focus:border-[#3B82F6]
                   "
-                />
-
-                <button
-                  onClick={() => console.log("File Attachment")}
-                  className="p-3 mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <PlusSquare size={20} className="text-[#1E293B] dark:text-[#F1F5F9]" />
-                </button>
+                /> 
 
                 <button
                   onClick={handleSendMessage}
                   className="
-                    px-4 py-3 text-white font-bold rounded-xl shadow-md 
-                    hover:opacity-90
+                    px-2 py-3 text-white font-bold rounded-xl shadow-md 
+                    hover:opacity-90 cursor-pointer
                   "
                   style={{ backgroundColor: BDU.ACCENT }}
+                  title="send"
                 >
-                  Send
+                  <ArrowUp size={20} />
                 </button>
               </div>
             </>
@@ -268,10 +260,10 @@ const InboxPage = () => {
           )}
         </div>
 
-        {/* Overlay for mobile */}
+      
         {isMobileSidebarOpen && (
           <div
-            className="absolute inset-0 bg-black bg-opacity-30 z-40 md:hidden"
+            className="absolute inset-0 transparent bg-opacity-30 z-40 md:hidden"
             onClick={() => setIsMobileSidebarOpen(false)}
           />
         )}

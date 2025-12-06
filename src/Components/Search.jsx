@@ -6,13 +6,13 @@ export default function Search({show }) {
 const { handleSearch } = useQuestions();
 
   return ( 
-    <div className={`relative mb-8 block  ${show?'':'md:hidden'}`}>
+    <div className={`relative mb-2 block  ${show?'':'md:hidden'}`}>
             <input
               type="text" 
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search questions..."
               className="
-                    w-full p-2 pl-10 rounded-xl 
+                    w-full p-2 pl-10 rounded-xl
                     border border-gray-300 
                     focus:border-[#2563EB] 
                     focus:ring-1 focus:ring-[#2563EB] 

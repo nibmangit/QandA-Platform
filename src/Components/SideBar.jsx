@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { CornerUpRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { CornerUpRight, List, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { BDU, BDU_DARK } from "../utils/css";
 import NavItem from "./NavItem";
 import { useAuth } from "../context/AuthContext";
@@ -24,7 +24,7 @@ const SideBar = ({ children, sidebarNavItems}) => {
       {/* Desktop Sidebar */}
       <aside
         className={`
-          hidden lg:block w-64 shrink-0 p-4 pt-10 sticky top-[76px] h-[calc(100vh-76px)] overflow-y-auto 
+          hidden lg:block w-64 shrink-0 p-4 pt-10 sticky top-[61px] h-[calc(100vh-76px)] overflow-y-auto 
           bg-white border-r border-gray-200
           dark:bg-[${DARK.BG_SECONDARY}] dark:border-gray-700
         `}
@@ -57,31 +57,21 @@ const SideBar = ({ children, sidebarNavItems}) => {
           </div>
         )}
       </aside>
-
-      {/* Sidebar Toggle Button (Full Width Bar) */}
-<div  className={`
-          lg:hidden p-0 fixed left-0 right-0 z-40 transition-colors duration-300 
-            bg-gray-100
-             top-20
-          dark:bg-[${DARK.BG_SECONDARY}] dark:text-[#F1F5F9] 
-        `}
-      >
-        <div className="lg:hidden p-0 fixed left-0 right-0 z-40 flex items-center justify-start max-w-7xl mx-auto">
-          
-          {/* Nested Button: The ONLY clickable element */}
+        <div
+          className={`
+            lg:hidden p-0 fixed top-13 left-0 z-60
+           bg-transparent dark:text-[#F1F5F9]
+            rounded-lg
+          `}
+          title={`${sidebarOpen?"Close":"Open Sidebar"}`}
+        >
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="flex items-center p-0 rounded-lg transition-colors duration-150 hover:bg-black/20"
           >
-            {sidebarOpen ? (
-              <PanelLeftClose size={24} className="mr-2" />
-            ) : (
-              <PanelLeftOpen size={24} className="mr-2" />
-            )} 
+            <List size={24} className="mr-2 cursor-pointer" />
           </button>
-          
         </div>
-      </div>
 
       {/* Mobile Sidebar */}
       <aside
@@ -89,7 +79,7 @@ const SideBar = ({ children, sidebarNavItems}) => {
           fixed top-[60px] left-0 h-[calc(100vh-76px)] w-64 p-4 pt-10 transition-transform duration-300 z-55 overflow-y-auto 
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden
           bg-white border-r border-gray-200
-          dark:bg-[${DARK.BG_SECONDARY}] dark:border-gray-700
+          dark:bg-[#0D1B2A] dark:border-gray-700
         `}
       > 
         <div className="space-y-2">

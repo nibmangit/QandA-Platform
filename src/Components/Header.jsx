@@ -14,14 +14,14 @@ const Header = ({unreadCount }) => {
   return (
     <header
       className="
-        fixed top-0 left-0 right-0 z-40 shadow-md 
+        fixed top-0 left-0 right-0 z-40 shadow-md
         bg-white/95 dark:bg-[#1A2A3A] 
         backdrop-blur-sm border-b 
         border-gray-200 dark:border-[#1E293B]
         transition-all
       "
     >
-      <div className="max-w-7xl mx-auto p-2 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto pb-0 pt-2 flex justify-between items-center">
  
         <div
           className="flex items-center cursor-pointer"

@@ -109,9 +109,8 @@ useEffect(() => {
           onSubmit={handleSubmit}
           className={`lg:col-span-2 space-y-6 bg-white dark:bg-[${BDU_DARK.BG}] dark:text-[${BDU_DARK.TEXT}] p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-[${BDU_DARK.BG_SECONDARY}]`}
         >
-          {/* Title */}
           <div>
-            <label className="block text-lg font-semibold mb-2" style={{ color: BDU.TEXT }}>
+            <label className={`block text-lg font-semibold mb-2`} >
               Question Title
             </label>
             <input
@@ -125,10 +124,9 @@ useEffect(() => {
               required
             />
           </div>
-
-          {/* Description */}
+ 
           <div>
-            <label className="block text-lg font-semibold mb-2" style={{ color: BDU.TEXT }}>
+            <label className="block text-lg font-semibold mb-2">
               Description (Details of your problem)
             </label>
             <textarea
@@ -145,7 +143,7 @@ useEffect(() => {
 
           {/* Category */}
           <div>
-            <label className="block text-lg font-semibold mb-2" style={{ color: BDU.TEXT }}>
+            <label className="block text-lg font-semibold mb-2">
               Category / Department Tag
             </label>
             <select
@@ -160,10 +158,9 @@ useEffect(() => {
               ))}
             </select>
           </div>
-
-          {/* Tags */}
+ 
           <div>
-            <label className="block text-lg font-semibold text-gray-700 dark:text-[${BDU_DARK.TEXT}] mb-2">
+            <label className="block text-lg font-semibold mb-2">
               Tags (comma-separated)
             </label>
             <input
@@ -174,10 +171,9 @@ useEffect(() => {
               className="w-full p-4 border border-gray-300 rounded-xl focus:ring-sky-400 focus:border-sky-400 shadow-sm text-gray-900 dark:bg-[${BDU_DARK.BG_SECONDARY}] dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
             />
           </div>
-
-          {/* Image Upload */}
+ 
           <div>
-            <label className="block text-lg font-semibold mb-2" style={{ color: BDU.TEXT }}>
+            <label className="block text-lg font-semibold mb-2">
               Optional Image Upload
             </label>
             <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
@@ -205,15 +201,15 @@ useEffect(() => {
             <button
               type="button"
               onClick={() => navigate("/dashboard")}
-              className="px-6 py-3 font-semibold rounded-xl transition-colors border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[${BDU_DARK.BG_SECONDARY}]"
-              style={{ color: BDU.TEXT }}
+              className="px-6 py-3 font-semibold rounded-xl transition-colors border dark:bg-gray-600 border-gray-300 dark:border-gray-600 cursor-pointer"
+              
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="px-6 py-3 text-white font-bold rounded-xl shadow-md transition-all hover:opacity-90"
+              className="px-6 py-3 text-white font-bold rounded-xl shadow-md transition-all hover:opacity-90 cursor-pointer"
               style={{ backgroundColor: BDU.ACCENT }}
             >
               {mode === "ask" ? "Post Question" : "Update Question"}

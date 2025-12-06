@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import {
   Home as HomeIcon, PlusSquare, BookOpen, Clock, Zap, Shield, User,
@@ -29,20 +29,13 @@ import NotificationsPage from "./pages/NotificationsPage";
 import AnnouncementDetailPage from './pages/AnnouncementDetailPage ';
 import { useAuth } from './context/AuthContext';
 
-const App = () => {
-
-  // const [isLoggedIn, setIsLoggedIn] = useState(true);
-  // const [currentUser, setCurrentUser] = useState(MOCK_USERS[2]);
+const App = () => { 
+  const location = useLocation();
   const [isRegistering, setIsRegistering] = useState(false);
   const {currentUser,isLoggedIn} = useAuth()
   const unreadCount = MOCK_MESSAGES.filter(
     m => m.receiverId === currentUser?.id && !m.read
-  ).length;
-
-  // const handleLoginSuccess = (user) => {
-  //   setCurrentUser(user);
-  //   setIsLoggedIn(true);
-  // };
+  ).length; 
 
   const sidebarNavItems = [
     { to: "/", label: "Home", icon: HomeIcon },
@@ -63,8 +56,12 @@ const App = () => {
     return true;
   });
 
-  return ( 
-    <Router>
+const hiddenHeaderPaths = ["/auth", "/ask-question", "/admin-dashboard"];
+const hiddenFooterPaths = ["/auth", "/ask-question", "/admin-dashboard", "/inbox"];
+const showHeader = !hiddenHeaderPaths.includes(location.pathname);
+const showFooter = !hiddenFooterPaths.includes(location.pathname);
+
+  return (  
       <div
       className={`bd-[${BDU.BG} transition-colors duration-300  min-h-screen font-[Inter,sans-serif] dark:bg-[#0D1B2A]`}
       >
@@ -74,9 +71,9 @@ const App = () => {
           .font-roboto { font-family: 'Roboto', sans-serif; }
         `}</style>
 
-        <Header 
+       {showHeader && <Header 
           unreadCount={unreadCount}
-        />
+        />}
 
         <main className="pt-[76px] pb-10">
           <SideBar sidebarNavItems={sidebarNavItems}  >
@@ -128,9 +125,8 @@ const App = () => {
           </SideBar>
         </main>
 
-        <Footer />
-      </div>
-    </Router> 
+        {showFooter && <Footer />}
+      </div> 
   );
 };
 

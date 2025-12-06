@@ -1,12 +1,14 @@
+import { useNavigate } from "react-router-dom";
 import { formatScore } from "../utils/Find";
 import {BDU,BDU_DARK} from "../utils/css";
 
-const UserCard = ({ user, onNavigate }) => {
+const UserCard = ({ user }) => {
+  const navigate = useNavigate()
 
 return(
   <div
     className={`flex items-center p-3 bg-white dark:bg-[#253546] rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer`}
-    onClick={() => onNavigate(`profile/${user.id}`)}
+    onClick={() => navigate(`/profile/${user.id}`)}
   >
     <img src={user.avatar} alt={user.name} className="h-10 w-10 rounded-full object-cover mr-3" />
     <div>

@@ -1,38 +1,9 @@
 import { MOCK_BADGES, MOCK_USERS } from "../utils/mock/mockData";
-import { Zap, MessageSquare, Calendar } from "lucide-react";
+import { Zap } from "lucide-react";
 import { formatScore } from "../utils/Find";
 import { useNavigate } from "react-router-dom";
-  const BadgeDisplay = ({ badgeName, icon: Icon, description }) => (
-    <div className="p-4 bg-white dark:bg-[#1A2A3A] rounded-xl shadow-md border border-gray-100 dark:border-slate-700 hover:shadow-lg transition-shadow">
-      <div className="flex items-center space-x-3 mb-2">
-        <span className="p-2 rounded-full bg-yellow-400 text-slate-900 dark:bg-yellow-600 dark:text-slate-900">
-          {Icon}
-        </span>
-
-        <h5 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-          {badgeName}
-        </h5>
-      </div>
-
-      <p className="text-sm text-gray-600 dark:text-slate-300">{description}</p>
-
-      {badgeName === "Newbie" && (
-        <div className="mt-3">
-          <p className="text-xs font-semibold text-gray-500 dark:text-slate-400">
-            Next Milestone: Helpful
-          </p>
-
-          <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2.5 mt-1">
-            <div className="h-2.5 rounded-full w-1/4 bg-blue-600 dark:bg-blue-400"></div>
-          </div>
-
-          <p className="text-xs text-right text-gray-500 dark:text-slate-400 mt-1">
-            25% complete
-          </p>
-        </div>
-      )}
-    </div>
-  );
+import BadgeDisplay from "../Components/BadgeDisplay";
+  
 const ReputationPage = () => {
   const navigate = useNavigate();
   const sortedUsers = MOCK_USERS.sort((a, b) => b.points - a.points);
@@ -112,7 +83,7 @@ const ReputationPage = () => {
               />
             ))}
 
-            <BadgeDisplay
+            {/* <BadgeDisplay
               badgeName="Top Answerer"
               icon={<MessageSquare size={16} />}
               description="Authored the most highly-voted answer in a month."
@@ -122,7 +93,7 @@ const ReputationPage = () => {
               badgeName="Veteran"
               icon={<Calendar size={16} />}
               description="Active on the platform for over one year."
-            />
+            /> */}
           </div>
         </div>
       </div>

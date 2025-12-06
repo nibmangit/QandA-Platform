@@ -98,23 +98,28 @@ if (searchText.trim()) {
               </button>
             </div>
           )}
-        </div>
-         {/* Sidebar Filters */}
-         
-        <div className={`lg:col-span-1 space-y-8`}>
-     <button
-        className={`lg:hidden  p-2 m-2 fixed top-20 right-2 z-50 rounded-md shadow-md transition-all duration-300 ease-in-out hover:bg-black/20`}
-        onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-        aria-label={isCategoryOpen ? "Close sidebar" : "Open sidebar"} 
-    >
-        {isCategoryOpen ?  (
-            <PanelLeftOpen size={24} className="dark:text-white" />
-        ):(
-            <PanelLeftClose size={24} className="dark:text-white" />
-        ) }
-      </button> 
+        </div>  
+
+
+        <div className={`lg:col-span-1 space-y-8`}>  
+        <div
+           className={`
+                     lg:hidden p-0 fixed top-13 right-0 z-60
+                    bg-transparent dark:text-[#F1F5F9]
+                     rounded-lg
+                   `}
+                   title={`${isCategoryOpen?"Close":"Open Category"}`}
+                 >
+                   <button
+                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                     className="flex items-center p-0 rounded-lg transition-colors duration-150 hover:bg-black/20"
+                   >
+                     <List size={24} className="mr-2 cursor-pointer" />
+                   </button>
+                 </div>
+
         <aside
-          className={`fixed top-[76px] right-0 h-[calc(100vh-76px)] w-64 bg-white dark:bg-[#1A2A3A] border-r border-gray-200 dark:border-[#1E293B] p-4 pt-10 transition-transform duration-300 z-40 overflow-y-auto ${
+          className={`fixed top-[55px] right-0 h-[calc(100vh-76px)] w-64 bg-white dark:bg-[#1A2A3A] border-r border-gray-200 dark:border-[#1E293B] p-4 pt-10 transition-transform duration-300 z-40 overflow-y-auto ${
             isCategoryOpen ? "-ranslate-x-0" : "translate-x-full"
           } lg:hidden`}
         >

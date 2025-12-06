@@ -24,6 +24,8 @@ export const AuthProvider = ({ children }) => {
       if (savedUser) {
         setCurrentUser(JSON.parse(savedUser));
         setIsLoggedIn(true);
+      }else{
+        setIsLoggedIn(false);
       }
     }
 
@@ -44,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     setError("");
 
     const user = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password.toLowerCase() === password.toLowerCase()
     );
 
     if (!user) {
@@ -73,7 +75,7 @@ export const AuthProvider = ({ children }) => {
       name,
       email,
       password,
-      role: "user",
+      role: "student",
     };
 
     setUsers((prev) => [...prev, newUser]);
