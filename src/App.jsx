@@ -5,7 +5,6 @@ import {
   Home as HomeIcon, PlusSquare, BookOpen, Clock, Zap, Shield, User,
   List, Bell, Mail } from "lucide-react"; 
 import {MOCK_MESSAGES } from "./utils/mock/mockData";
-
 import { BDU } from "./utils/css";
 
 import Header from "./Components/Header";
@@ -19,7 +18,7 @@ import AskQuestionPage from "./pages/AskQuestionPage";
 import AllQuestionsPage from "./pages/AllQuestionsPage";
 import QuestionDetailsPage from "./pages/QuestionDetailsPage";
 import UserProfilePage from "./pages/UserProfilePage";
-import AdminDashboard from "./Admin/AdminDashboard";
+import NotFoundPage from './pages/NotFoundPage';
 import ReputationPage from "./pages/ReputationPage";
 import ActivityFeedPage from "./pages/ActivityFeedPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
@@ -46,7 +45,6 @@ const App = () => {
     { to: "/activity-feed", label: "Activity Feed", icon: Clock },
     { to: "/inbox", label: "Inbox", icon: Mail, requiresAuth: true },
     { to: currentUser ? `/profile/${currentUser.id}` : "/auth", label: "My Profile", icon: User, requiresAuth: true },
-    { to: "/admin-dashboard", label: "Admin Panel", icon: Shield, requiresAuth: true, adminOnly: true },
     { to: "/dashboard", label: "Dashboard", icon: Shield, requiresAuth: true },
     { to: "/notifications", label: "Notifications", icon: Bell, requiresAuth: true },
     { to: "/announcements", label: "Announcements", icon: Bell }, 
@@ -56,10 +54,12 @@ const App = () => {
     return true;
   });
 
-const hiddenHeaderPaths = ["/auth", "/ask-question", "/admin-dashboard"];
-const hiddenFooterPaths = ["/auth", "/ask-question", "/admin-dashboard", "/inbox"];
-const showHeader = !hiddenHeaderPaths.includes(location.pathname);
-const showFooter = !hiddenFooterPaths.includes(location.pathname);
+  const hiddenHeaderPaths = ["/auth", "/notfound"];
+  const hiddenFooterPaths = ["/auth", "/inbox", "/notfound"];
+  const showHeader = !hiddenHeaderPaths.includes(location.pathname);
+  const showFooter = !hiddenFooterPaths.includes(location.pathname);
+
+  const isFullScreenPage = location.pathname === "/notfound" || location.pathname === "/auth";
 
   return (  
       <div
@@ -76,12 +76,14 @@ const showFooter = !hiddenFooterPaths.includes(location.pathname);
         />}
 
         <main className="pt-[76px] pb-10">
-          <SideBar sidebarNavItems={sidebarNavItems}  >
+          {isFullScreenPage? (<Routes>
+            <Route path="/notfound" element={<NotFoundPage />} />
+            <Route path="/auth" element={ <AuthPage isRegister={isRegistering} setIsRegister={setIsRegistering}  /> } />
+          </Routes>):
+            (<SideBar sidebarNavItems={sidebarNavItems}  >
             <div className="flex-1 min-w-0 mt-6 lg:mt-0 px-4 lg:px-8">
 
-              <Routes>
-
-                {/* Public Routes */}
+              <Routes> 
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/questions" element={<AllQuestionsPage />} />
                 <Route path="/question/:id" element={<QuestionDetailsPage />} />
@@ -89,12 +91,10 @@ const showFooter = !hiddenFooterPaths.includes(location.pathname);
                 <Route path="/reputation" element={<ReputationPage />} />
                 <Route path="/activity-feed" element={<ActivityFeedPage />} />
                 <Route path="/announcements" element={<AnnouncementsPage />} />
-                <Route path="/announcements/:announcementId" element={<AnnouncementDetailPage />} />
+                <Route path="/announcements/:announcementId" element={<AnnouncementDetailPage />} /> 
 
-                {/* Auth Route */}
                 <Route path="/auth" element={ <AuthPage isRegister={isRegistering} setIsRegister={setIsRegistering}  /> } />
-
-                {/* Protected Routes */}
+ 
                 <Route path="/dashboard" element={isLoggedIn ? ( <Dashboard /> ) : ( <Navigate to="/auth" replace /> )} />
                 <Route  path="/ask-question"  element={isLoggedIn ? (<AskQuestionPage mode='ask' /> ) : (  <Navigate to="/auth" replace /> )}  />
                 <Route  path="/edit-question/:questionId"  element={isLoggedIn ? (  <AskQuestionPage mode='edit' /> ) : (<Navigate to="/auth" replace /> )} />
@@ -102,30 +102,17 @@ const showFooter = !hiddenFooterPaths.includes(location.pathname);
                 <Route path="/inbox" element={isLoggedIn ? ( <InboxPage /> ) : ( <Navigate to="/auth" replace /> )}  />
                 <Route  path="/notifications"  element={isLoggedIn ? ( <NotificationsPage /> ) : ( <Navigate to="/auth" replace />  )} />
 
-                {/* Admin Only */}
-                <Route
-                  path="/admin-dashboard"
-                  element={
-                    currentUser?.role === "admin" ? (
-                      <AdminDashboard />
-                    ) : (
-                      <div className="p-10 text-center text-red-500">
-                        Access Denied: Admin required.
-                      </div>
-                    )
-                  }
-                />
-
                 {/* 404 */}
-                <Route  path="*"  element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/notfound" replace />} />
 
               </Routes>
 
             </div>
-          </SideBar>
+          </SideBar>)}
+          
         </main>
 
-        {showFooter && <Footer />}
+        {showFooter && isFullScreenPage && <Footer />}
       </div> 
   );
 };

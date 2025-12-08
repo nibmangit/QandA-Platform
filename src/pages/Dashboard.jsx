@@ -22,28 +22,22 @@ const Dashboard = () => {
 
 
   return (
-    <div className="max-w-7xl mx-auto py-10 px-4">
-      {/* Welcome */}
+    <div className="max-w-7xl mx-auto py-10 px-4"> 
       <h2
         className="text-3xl font-extrabold mb-6 dark:text-gray-100 text-gray-900"
         style={{ letterSpacing: '0.5px' }}
       >
         Welcome, {currentUser.name}!
-      </h2>
-
-      {/* Quick Actions */}
+      </h2> 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <QuickAction icon={PlusSquare} title="Ask Question" description="Start a new discussion." onClick={() => navigate('/ask-question')} />
         <QuickAction icon={List} title="My Questions" description="View your submission history." onClick={() => navigate(`/profile/${currentUser.id}`)} />
         <QuickAction icon={Mail} title="Messages" description="Check private conversations." onClick={() => navigate('/inbox')} />
         <QuickAction icon={Settings} title="Profile Settings" description="Manage account details." onClick={() => navigate(`/profile/${currentUser.id}`)} />
       </div>
-
-      {/* Main Content & Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Notifications Feed */}
+ 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> 
+        <div className="lg:col-span-2 space-y-8"> 
           <div className="p-6 rounded-2xl shadow-xl border transition-colors border-gray-100 dark:border-gray-700 bg-white dark:bg-[#0F172A]">
             <h3 className="text-xl font-bold mb-4 flex justify-between items-center dark:text-gray-100 text-gray-900">
               Notifications Feed
@@ -72,8 +66,7 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-
-          {/* My Recent Questions */}
+ 
           <div className="p-6 rounded-2xl shadow-xl border transition-colors border-gray-100 dark:border-gray-700 bg-white dark:bg-[#0F172A]">
             <h3 className="text-xl font-bold mb-4 dark:text-gray-100 text-gray-900">My Recent Questions</h3>
             <div className="space-y-4">
@@ -83,8 +76,7 @@ const Dashboard = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-1 space-y-8">
-          {/* Reputation & Badges */}
+        <div className="lg:col-span-1 space-y-8"> 
           <div className="p-6 rounded-2xl shadow-xl border transition-colors border-gray-100 dark:border-gray-700 bg-white dark:bg-[#0F172A]">
             <h3 className="text-xl font-bold mb-4 dark:text-gray-100 text-gray-900">
               My Reputation

@@ -13,7 +13,6 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
   const [name, setName] = useState("");
 
   const handleLogin = (e) => {
-    console.log("email:", email, "Password:", password)
     e.preventDefault();
     const success = login(email, password);
     if (success) navigate("/");
@@ -21,79 +20,76 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
 
   const handleRegister = (e) => {
     e.preventDefault();
-
     if (!name || !email || !password) {
       setError("Please fill out all input fields!");
       return;
     }
-
     const success = register({ name, email, password });
     if (success) navigate("/");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100 dark:bg-[#0F172A] transition-colors">
-      <div className="flex w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden bg-white dark:bg-[#1E293B] transition-colors">
+    <div className="max-h-screen flex items-center justify-center p-1 bg-gray-100 dark:bg-[#0F172A] transition-colors">
+      <div className="flex flex-col mt-0 md:flex-row w-full max-w-5xl bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl overflow-hidden">
+        
+        
+        <div className="hidden md:flex w-1/2 items-center justify-center p-12"
+              style={{ background: `linear-gradient(135deg, ${BDU.NAVY} 0%, #004488 100%)` }}>
+            <div className="text-center text-white">
+              <BookOpen size={64} className="mx-auto mb-4" style={{ color: BDU.GOLD }} />
 
-        {/* LEFT SIDE */}
-        <div
-          className="hidden md:flex w-1/2 items-center justify-center p-12"
-          style={{ background: `linear-gradient(45deg, ${BDU.NAVY} 0%, #004488 100%)` }}
-        >
-          <div className="text-white text-center">
-            <BookOpen size={64} className="mx-auto mb-4" style={{ color: BDU.GOLD }} />
-            <h2 className="text-3xl font-bold font-poppins">The Pursuit of Knowledge</h2>
-            <p className="mt-2 text-sm opacity-90 font-roboto">
-              Join the BDU community to share and discover answers.
-            </p>
-          </div>
+              <h2 className="text-3xl font-bold font-poppins mb-2">Empowering Curious Minds</h2>
+
+              <p className="mt-2 text-sm opacity-90 font-roboto">
+                Connect, learn, and share knowledge with BDU students.
+              </p> 
+              <div className="mt-6 flex flex-col space-y-2 text-left text-white text-sm font-roboto">
+                <div className="flex items-center space-x-2"><span>📚</span><span>Ask & answer questions easily</span></div>
+                <div className="flex items-center space-x-2"><span>⚡</span><span>Boost your reputation points</span></div>
+                <div className="flex items-center space-x-2"><span>🏆</span><span>Earn badges for contributions</span></div>
+                <div className="flex items-center space-x-2"><span>💬</span><span>Connect with other students</span></div>
+              </div> 
+              <div className="mt-6 w-24 h-2 bg-linear-to-r from-yellow-400 to-orange-500 mx-auto rounded-full animate-pulse"></div>
+            </div>
         </div>
 
         {/* RIGHT SIDE FORM */}
-        <div className="w-full md:w-1/2 p-8 sm:p-12">
+        <div className="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center relative">
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-gray-100">
             {isRegister ? "Create Account" : "Welcome Back"}
           </h2>
 
-          <form
-            onSubmit={isRegister ? handleRegister : handleLogin}
-            className="space-y-4"
-          >
+          <form onSubmit={isRegister ? handleRegister : handleLogin} className="space-y-5">
+            
             {isRegister && (
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">
-                  Name
-                </label>
+                <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">
-                Email
-              </label>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">
-                Password
-              </label>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
               />
             </div>
 
@@ -101,7 +97,7 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
 
             {!isRegister && (
               <div className="text-right text-sm">
-                <button type="button" className="hover:underline text-blue-600 dark:text-blue-400 hover:cursor-pointer">
+                <button type="button" className="hover:underline text-blue-600 dark:text-blue-400 cursor-pointer">
                   Forgot Password?
                 </button>
               </div>
@@ -109,7 +105,7 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
 
             <button
               type="submit"
-              className="w-full py-3 mt-4 text-white font-bold rounded-xl shadow-md hover:opacity-90"
+              className="w-full py-3 mt-4 text-white font-bold rounded-xl shadow-md hover:opacity-90 hover:scale-[1.02] transition transform"
               style={{ backgroundColor: BDU.ACCENT }}
             >
               {isRegister ? "Register" : "Login"}
@@ -129,6 +125,10 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
               {isRegister ? "Login" : "Register"}
             </button>
           </p>
+
+          {/* Decorative background blur circles */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-yellow-400 opacity-20 blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-blue-500 opacity-20 blur-3xl pointer-events-none"></div>
         </div>
       </div>
     </div>
