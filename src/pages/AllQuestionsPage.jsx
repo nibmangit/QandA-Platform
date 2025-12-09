@@ -46,10 +46,10 @@ const AllQuestionsPage = () => {
 if (searchText.trim()) {
       const q = searchText.toLowerCase();
 
-      list = list.filter(item =>
+        list = list.filter(item =>
         item.title.toLowerCase().includes(q) ||
-        item.body.toLowerCase().includes(q) ||
-        item.tags.some(tag => tag.toLowerCase().includes(q))
+        item.body.toLowerCase().includes(q)
+        // item.tags.some(tag => tag.toLowerCase().includes(q))
       );
     }
  

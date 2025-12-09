@@ -22,13 +22,14 @@ const SideBar = ({ children, sidebarNavItems}) => {
     <div className="flex">
 
       {/* Desktop Sidebar */}
-      <aside
-        className={`
-          hidden lg:block w-64 shrink-0 p-4 pt-10 sticky top-[61px] h-[calc(100vh-76px)] overflow-y-auto 
-          bg-white border-r border-gray-200
-          dark:bg-[${DARK.BG_SECONDARY}] dark:border-gray-700
-        `}
-      >
+     <aside className="hidden lg:block w-64 shrink-0 sticky top-[61px]">
+        <div
+          className={`
+            p-4 pt-10 h-[calc(100vh-76px)] overflow-y-auto 
+            bg-white border-r border-gray-200
+            dark:bg-[${DARK.BG_SECONDARY}] dark:border-gray-700
+          `}
+        >
         <div className="space-y-2">
           {sidebarNavItems?.map((item) => (
             <Link key={item.to} to={item.to}>
@@ -55,7 +56,8 @@ const SideBar = ({ children, sidebarNavItems}) => {
               <span>Logout</span>
             </button>
           </div>
-        )}
+        )} 
+        </div>
       </aside>
         <div
           className={`
@@ -76,7 +78,7 @@ const SideBar = ({ children, sidebarNavItems}) => {
       {/* Mobile Sidebar */}
       <aside
         className={`
-          fixed top-[60px] left-0 h-[calc(100vh-76px)] w-64 p-4 pt-10 transition-transform duration-300 z-55 overflow-y-auto 
+          fixed top-[49px] left-0 h-[calc(100vh-76px)] w-64 p-4 pt-10 transition-transform duration-300 z-55 overflow-y-auto 
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden
           bg-white border-r border-gray-200
           dark:bg-[#0D1B2A] dark:border-gray-700

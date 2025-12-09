@@ -19,14 +19,14 @@ import AllQuestionsPage from "./pages/AllQuestionsPage";
 import QuestionDetailsPage from "./pages/QuestionDetailsPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import NotFoundPage from './pages/NotFoundPage';
-import ReputationPage from "./pages/ReputationPage";
-import ActivityFeedPage from "./pages/ActivityFeedPage";
+import ReputationPage from "./pages/ReputationPage"; 
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import CategoryPage from "./pages/CategoryPage";
 import InboxPage from "./pages/InboxPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AnnouncementDetailPage from './pages/AnnouncementDetailPage ';
 import { useAuth } from './context/AuthContext';
+import BookMarkPage from './pages/BookMarkPage';
 
 const App = () => { 
   const location = useLocation();
@@ -41,8 +41,7 @@ const App = () => {
     { to: "/ask-question", label: "Ask Question", icon: PlusSquare, requiresAuth: true },
     { to: "/questions", label: "All Questions", icon: List },
     { to: "/categories", label: "Categories", icon: BookOpen },
-    { to: "/reputation", label: "Reputation", icon: Zap },
-    { to: "/activity-feed", label: "Activity Feed", icon: Clock },
+    { to: "/reputation", label: "Reputation", icon: Zap }, 
     { to: "/inbox", label: "Inbox", icon: Mail, requiresAuth: true },
     { to: currentUser ? `/profile/${currentUser.id}` : "/auth", label: "My Profile", icon: User, requiresAuth: true },
     { to: "/dashboard", label: "Dashboard", icon: Shield, requiresAuth: true },
@@ -88,8 +87,7 @@ const App = () => {
                 <Route path="/questions" element={<AllQuestionsPage />} />
                 <Route path="/question/:id" element={<QuestionDetailsPage />} />
                 <Route path="/categories" element={<CategoryPage />} />
-                <Route path="/reputation" element={<ReputationPage />} />
-                <Route path="/activity-feed" element={<ActivityFeedPage />} />
+                <Route path="/reputation" element={<ReputationPage />} /> 
                 <Route path="/announcements" element={<AnnouncementsPage />} />
                 <Route path="/announcements/:announcementId" element={<AnnouncementDetailPage />} /> 
 
@@ -101,6 +99,7 @@ const App = () => {
                 <Route  path="/profile/:userId"  element={isLoggedIn ? ( <UserProfilePage /> ) : ( <Navigate to="/auth" replace /> )} />
                 <Route path="/inbox" element={isLoggedIn ? ( <InboxPage /> ) : ( <Navigate to="/auth" replace /> )}  />
                 <Route  path="/notifications"  element={isLoggedIn ? ( <NotificationsPage /> ) : ( <Navigate to="/auth" replace />  )} />
+                <Route  path="/bookmarks"  element={isLoggedIn ? ( <BookMarkPage /> ) : ( <Navigate to="/auth" replace />  )} />
 
                 {/* 404 */}
                 <Route path="*" element={<Navigate to="/notfound" replace />} />
@@ -112,7 +111,7 @@ const App = () => {
           
         </main>
 
-        {showFooter && isFullScreenPage && <Footer />}
+        {showFooter && <Footer />}
       </div> 
   );
 };

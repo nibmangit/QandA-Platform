@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calendar, Edit, Trash2, ThumbsUp, ThumbsDown, MessageSquare, Zap, CornerUpRight, BookOpen,} from "lucide-react";
+import { useRef, useState } from "react";
+import { Calendar,Bookmark, Edit, Trash2, ThumbsUp, ThumbsDown, MessageSquare, Zap, CornerUpRight, BookOpen, PlusCircle,} from "lucide-react";
 import { MOCK_QUESTIONS, MOCK_ANSWERS } from "../utils/mock/mockData";
 import { findCategory, findUser } from "../utils/Find";
 import { BDU } from "../utils/css";
@@ -12,20 +12,19 @@ import ActionButton from "../helper/ActionButton";
 const generateUUID = () => crypto.randomUUID().slice(0, 8); 
 
 const QuestionDetailsPage = ({ onDelete }) => {
+   const bottomRef = useRef(null);
   const { currentUser } = useAuth();
   const { id } = useParams();
   const questionId = id;
   const navigate = useNavigate();
-  const question = MOCK_QUESTIONS.find((q) => q.id === questionId);
-
-  // Local answers state: copy answers for this question into state and ensure each answer has comments array
+  const question = MOCK_QUESTIONS.find((q) => q.id === questionId); 
   const [answers, setAnswers] = useState(() =>
     MOCK_ANSWERS.filter((a) => a.questionId === questionId).map((a) => ({
       ...a,
       comments: Array.isArray(a.comments) ? [...a.comments] : [], // keep comments if present
     }))
   );
-
+console.log(answers)
   const [answerCount, setAnswerCount] = useState(question?.answers || answers.length);
 
   const author = findUser(question?.authorId);
@@ -33,24 +32,25 @@ const QuestionDetailsPage = ({ onDelete }) => {
   const relatedQuestions = MOCK_QUESTIONS.filter(
     (q) => q.id !== questionId && q.categoryId === question?.categoryId
   ).slice(0, 3);
-
-  const [newAnswer, setNewAnswer] = useState("");
-  // commentInputs: { [answerId]: "text" }
-  const [commentInputs, setCommentInputs] = useState({});
-  // UI state:
-  const [openCommentsFor, setOpenCommentsFor] = useState(null); // answerId or null
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [newAnswer, setNewAnswer] = useState(""); 
+  const [commentInputs, setCommentInputs] = useState({}); 
+  const [openCommentsFor, setOpenCommentsFor] = useState(null);
   const [editingAnswerId, setEditingAnswerId] = useState(null);
   const [editingAnswerText, setEditingAnswerText] = useState("");
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingCommentText, setEditingCommentText] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  // deleteTarget: { type: 'question'|'answer'|'comment', answerId?, commentId? }
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   if (!question) return <div className="p-10 text-center text-red-500">Question not found.</div>;
 
   const isQuestionOwner = currentUser?.id === question.authorId;
-
+const handleBookmark = () => {
+    setBookmarked(prev => !prev);
+  };
   // ----------------- Answer operations -----------------
   const handlePostAnswer = () => {
     if (!newAnswer.trim()) return;
@@ -89,14 +89,14 @@ const QuestionDetailsPage = ({ onDelete }) => {
     setDeleteTarget(null);
   };
 
-  const handleLike = (answerId) => {
-    setAnswers((prev) => prev.map((a) => (a.id === answerId ? { ...a, likes: a.likes + 1 } : a)));
+  const handleLike = () => {
+     setLiked(prev => !prev);
+    if (!liked && disliked) setDisliked(false);
   };
 
-  const handleDislike = (answerId) => {
-    setAnswers((prev) =>
-      prev.map((a) => (a.id === answerId ? { ...a, dislikes: a.dislikes + 1 } : a))
-    );
+  const handleDislike = () => {
+     setDisliked(prev => !prev);
+    if (!disliked && liked) setLiked(false);
   };
 
   // ----------------- Comment operations -----------------
@@ -122,17 +122,14 @@ const QuestionDetailsPage = ({ onDelete }) => {
     setAnswers((prev) =>
       prev.map((a) => (a.id === answerId ? { ...a, comments: [...a.comments, newComment] } : a))
     );
-
-    // clear input for that answer
-    setCommentInputs((prev) => ({ ...prev, [answerId]: "" }));
-    // ensure comments panel open
+ 
+    setCommentInputs((prev) => ({ ...prev, [answerId]: "" })); 
     setOpenCommentsFor(answerId);
   };
 
   const startEditComment = (answerId, commentId, currentText) => {
     setEditingCommentId(commentId);
-    setEditingCommentText(currentText);
-    // ensure comments are open for this answer
+    setEditingCommentText(currentText); 
     setOpenCommentsFor(answerId);
   };
 
@@ -164,8 +161,7 @@ const QuestionDetailsPage = ({ onDelete }) => {
     setIsModalOpen(false);
     setDeleteTarget(null);
   };
-
-  // ----------------- Question delete (uses onDelete prop) -----------------
+ 
   const confirmDeleteQuestion = () => {
     setDeleteTarget({ type: "question", questionId: question.id });
     setIsModalOpen(true);
@@ -178,10 +174,14 @@ const QuestionDetailsPage = ({ onDelete }) => {
     else if (type === "comment") deleteComment(deleteTarget.answerId, deleteTarget.commentId);
     else if (type === "question") {
       setIsModalOpen(false);
-      setDeleteTarget(null);
-      // call parent's onDelete
+      setDeleteTarget(null); 
       if (onDelete) onDelete(question.id);
     }
+  };
+
+ 
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -194,8 +194,16 @@ const QuestionDetailsPage = ({ onDelete }) => {
             <div className="bg-white dark:bg-[#1E293B] p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
               <div className="flex justify-between items-start mb-4">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">{question.title}</h1>
-                {isQuestionOwner && (
                   <div className="flex space-x-2">
+                    <button
+                      className="flex items-center text-sm text-yellow-500 hover:text-yellow-600 hover:cursor-pointer"
+                      onClick={handleBookmark}
+                      title="Edit"
+                    >
+                      <Bookmark size={16} fill={bookmarked?"#FBBF24":"none"} />
+                    </button>
+                {isQuestionOwner && 
+                  <>
                     <button
                       className="flex items-center text-sm text-yellow-500 hover:text-yellow-600 hover:cursor-pointer"
                       onClick={() => navigate(`/edit-question/${question.id}`)}
@@ -207,11 +215,12 @@ const QuestionDetailsPage = ({ onDelete }) => {
                       className="flex items-center text-sm text-red-500 hover:text-red-600 hover:cursor-pointer"
                       onClick={confirmDeleteQuestion}
                       title="Delete"
-                    >
+                      >
                       <Trash2 size={16} className="mr-1" />
                     </button>
+                      </>
+                   }
                   </div>
-                )}
               </div>
 
               <p className={`flex font-semibold text-blue-600 dark:text-[#3B82F6]`}>@ {category?.name}</p>
@@ -230,7 +239,7 @@ const QuestionDetailsPage = ({ onDelete }) => {
               </div>
 
               {question.image && (
-                <img src={question.image} alt="Question Diagram" className="w-full max-h-80 object-cover rounded-xl my-4 border border-gray-200 dark:border-gray-700" />
+                <img src={`/${question.image}`} alt="Question Diagram" className="w-full max-h-80 object-cover rounded-xl my-4 border border-gray-200 dark:border-gray-700" />
               )}
 
               <p className="text-base leading-relaxed mb-6 text-gray-900 dark:text-gray-100">{question.body}</p>
@@ -238,8 +247,8 @@ const QuestionDetailsPage = ({ onDelete }) => {
               
               <div className="flex justify-between items-center border-t border-gray-100 dark:border-gray-700 pt-4">
                 <div className="flex space-x-4">
-                  <StatButton count={question.likes} icon={ThumbsUp} colorClass="text-green-500" label="Upvotes" />
-                  <StatButton count={question.dislikes} icon={ThumbsDown} colorClass="text-red-500" label="Downvotes" />
+                  <StatButton filled={liked?"#33BF24":"none"} count={question.likes} icon={ThumbsUp} colorClass="text-green-500" label="Likes" onClick={handleLike} />
+                  <StatButton filled={disliked?"#F00":"none"} count={question.dislikes} icon={ThumbsDown} colorClass="text-red-500" label="Dislikes" onClick={handleDislike} />
                   <StatButton
                     count={answerCount}
                     icon={MessageSquare}
@@ -247,6 +256,7 @@ const QuestionDetailsPage = ({ onDelete }) => {
                     label="Answers"
                     onClick={() => setOpenCommentsFor(null) || setOpenCommentsFor("toggle-answers") /* dummy toggle handled below */}
                   />
+                  <StatButton count={question.dislikes} icon={PlusCircle} colorClass="text-green-500" label="Give Your Answer" onClick={scrollToBottom} />
                 </div>
               </div>
             </div>
@@ -314,8 +324,8 @@ const QuestionDetailsPage = ({ onDelete }) => {
                     </div>
 
                     <div className="flex space-x-2">
-                      <ActionButton icon={ThumbsUp} label={answer.likes} onClick={() => handleLike(answer.id)} />
-                      <ActionButton icon={ThumbsDown} label={answer.dislikes} onClick={() => handleDislike(answer.id)} />
+                      <ActionButton filled={liked?"#FBBF24":"none"} icon={ThumbsUp} label={answer.likes} onClick={ handleLike} />
+                      <ActionButton filled={disliked?"#FBBF24":"none"} icon={ThumbsDown} label={answer.dislikes} onClick={handleDislike} />
                       <ActionButton
                         icon={MessageSquare}
                         label="Comment"
@@ -385,7 +395,7 @@ const QuestionDetailsPage = ({ onDelete }) => {
             </div>
 
             {/* Add Answer Form */}
-            <div className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+            <div ref={bottomRef} className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Your Answer</h3>
               <textarea
                 value={newAnswer}
@@ -405,16 +415,7 @@ const QuestionDetailsPage = ({ onDelete }) => {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-8">
-            <div className="sticky top-24 bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
-              <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Actions</h3>
-              <div className="space-y-3">
-                <ActionButton icon={Zap} label="Report" onClick={() => console.log("Reported")} />
-                <ActionButton icon={CornerUpRight} label="Share" onClick={() => console.log("Shared")} />
-                <ActionButton icon={BookOpen} label="Save" onClick={() => console.log("Saved")} />
-              </div>
-            </div>
-
+          <div className="lg:col-span-1 space-y-8">  
             <div className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
               <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Related Questions</h3>
               <div className="space-y-3">

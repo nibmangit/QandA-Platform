@@ -3,7 +3,7 @@
 export const MOCK_USERS = [
   { id: 'user-001', name: 'Almaz Birtukan',password:"almaz1234", email: 'almaz@bdu.edu.et', role: 'student', points: 1250, bio: '4th year CS student, focusing on AI and Machine Learning.', badges: ['bg-6','bg-7', 'bg-8'] }, 
   { id: 'user-003', name: 'Nib Men',password:"nib1234", email: 'nibretu@gmail.com', role: 'admin', points: 5800, bio: 'Lead moderator and faculty advisor in the EE department.', avatar: 'https://res.cloudinary.com/dahvdgqbf/image/upload/v1761065606/stgjwl3pw1cyausmzsys.png', badges: ['bg-1', 'bg-2'] },
-  { id: 'user-004', name: 'Sara Genet',password:"sara1234", email: 'sara@bdu.edu.et', role: 'student', points: 75, bio: 'Just started my journey in Business and Economics.', avatar: 'https://placehold.co/100x100/D2B4DE/003366?text=SG', badges: ['bg-1', 'bg-2','bg-3', 'bg-4','bg-5', 'bg-6','bg-7'] },
+  { id: 'user-004', name: 'Sara Genet',password:"sara1234", email: 'sara@gmail.com', role: 'student', points: 75, bio: 'Just started my journey in Business and Economics.', avatar: 'https://placehold.co/100x100/D2B4DE/003366?text=SG', badges: ['bg-1', 'bg-2','bg-3', 'bg-4','bg-5', 'bg-6','bg-7'] },
   { id: 'user-005', name: 'Sara Alem',password:"saraa1234", email: 'alem@bdu.edu.et', role: 'student', points: 75, bio: 'Just started my journey in Business and Economics.', avatar: 'https://placehold.co/100x100/D2B4DE/003366?text=SG', badges: ['bg-2','bg-3', 'bg-4','bg-5',] },
   { id: 'user-006', name: 'Me Abe',password:"mememe1234", email: 'me@bdu.edu.et', role: 'student', points: 75, bio: 'Just started my journey in Business and Economics.', avatar: 'https://placehold.co/100x100/D2B4DE/003366?text=SG', badges: ['bg-6','bg-7', 'bg-8'] },
   { id: 'user-007', name: 'Y Yen',password:"yyyyy1234", email: 'y@bdu.edu.et', role: 'student', points: 75, bio: 'Just started my journey in Business and Economics.', avatar: 'https://placehold.co/100x100/D2B4DE/003366?text=SG', badges: ['bg-6','bg-7', 'bg-8'] },
@@ -47,12 +47,20 @@ export const MOCK_BADGES = [
   { id:'bg-7', name: 'Contributor', icon: 'star' , description: 'Awarded after submitting 5 answers.' },
   { id:'bg-8', name: 'Beginner Helper', icon: 'sparkles' , description: 'Awarded after submitting 1 answer.' },
 ];
+
+export const MOCK_TAGS = [
+   {"id": 1, "name": "Java" },
+    {"id" : 2,"name": "HTML"}, 
+    {"id":3, "name":"CSS" },
+    {"id":4,"name":"React"},
+    {"id":5,"name":"Django"},
+]
  
 export const MOCK_QUESTIONS = [
   {
     id: "q-001",
     title: "Deep Learning vs. Reinforcement Learning: Which is more viable for optimizing BDU scheduling?",
-    tags: ["java", "HTML", "CSS", "React", "Django"],
+    tags: [1,3],
     categoryId: "cat-cs",
     authorId: "user-001",
     body: "I am starting my final year project and am stuck between focusing on a DL-based predictive model or using RL for dynamic schedule optimization...",
@@ -60,13 +68,13 @@ export const MOCK_QUESTIONS = [
     dislikes: 5,
     answers: 12,
     date: "2025-10-25T10:00:00Z",
-    image: "slides/design3.png"
+    image: "image.png"
   },
 
   {
     id: "q-002",
     title: "What is the required clearance distance for 132kV transmission lines in an urban setting?",
-    tags: ["java", "CSS", "React", "Django"],
+    tags: [1,3,2,5],
     categoryId: "cat-ee",
     authorId: "user-003",
     body: "I am reviewing a proposal and need to verify the safety requirements based on Ethiopian Electric Power standards.",
@@ -79,7 +87,7 @@ export const MOCK_QUESTIONS = [
   {
     id: "q-003",
     title: "Best practices for writing a convincing research proposal for an internal grant?",
-    tags: ["java", "CSS", "React", "Django"],
+    tags: [3,5,2,1],
     categoryId: "cat-bus",
     authorId: "user-002",
     body: "As a faculty member, what elements does the BDU research review board prioritize?",
@@ -92,7 +100,7 @@ export const MOCK_QUESTIONS = [
   {
     id: "q-004",
     title: "Can a contract be voided based on a change in market conditions (Force Majeure)?",
-    tags: ["java", "CSS", "React", "Django"],
+    tags: [1,3],
     categoryId: "cat-law",
     authorId: "user-001",
     body: "Considering the recent import restrictions, can a supplier legally back out of a fixed-price contract?",

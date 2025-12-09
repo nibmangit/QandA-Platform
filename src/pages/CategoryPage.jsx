@@ -1,61 +1,50 @@
-import { useMemo, useState } from "react";
+import {useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MOCK_CATEGORIES,MOCK_QUESTIONS } from "../utils/mock/mockData";
+import { MOCK_CATEGORIES,MOCK_QUESTIONS, MOCK_TAGS } from "../utils/mock/mockData";
 import { BookOpen, Tags } from "lucide-react";
 import { BDU, BDU_DARK } from "../utils/css";
+import useTagsWithCount from "../helper/useTagsWithCount"
 
 const CategoryPage = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("categories"); 
-  
-   const tags = useMemo(() => {
-    const allTags = MOCK_QUESTIONS.flatMap(q => q.tags);
-    const uniqueTags = [...new Set(allTags)];
-    return uniqueTags.map(tag => ({
-    id: tag,
-    count: allTags.filter(t => t === tag).length
-  }));
-  }, []);
+  const tags = useTagsWithCount();
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
-
-      {/* PAGE TITLE */}
+ 
       <h2
         className={`text-3xl font-bold mb-8 text-[${BDU.NAVY}] dark:text-[${BDU_DARK.TEXT}]`}
       >
         <BookOpen size={28} className="inline mr-2" />
         Explore Topics
       </h2>
+ 
+        <div className="flex gap-4 mb-8">
+          <button
+            onClick={() => setView("categories")}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-colors hover:cursor-pointer
+              ${view === "categories"
+                ? `bg-[#2563EB] dark:bg-[#3B82F6] dark:text-white text-gray-700]`
+                : `bg-gray-200 dark:bg-[#1E293B]  dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#2563EB]`
+              }
+            `}
+          >
+            Categories
+          </button>
 
-{/* TOGGLE BUTTONS */}
-<div className="flex gap-4 mb-8">
-  <button
-    onClick={() => setView("categories")}
-    className={`px-5 py-2 rounded-xl text-sm font-semibold transition-colors hover:cursor-pointer
-      ${view === "categories"
-        ? `bg-[#2563EB] dark:bg-[#3B82F6] dark:text-white text-gray-700]`
-        : `bg-gray-200 dark:bg-[#1E293B]  dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#2563EB]`
-      }
-    `}
-  >
-    Categories
-  </button>
-
-  <button
-    onClick={() => setView("tags")}
-    className={`px-5 py-2 rounded-xl hover:cursor-pointer text-sm font-semibold transition-colors
-      ${view === "tags"
-        ? `bg-[${BDU.ACCENT}] text-white dark:bg-[${BDU.ACCENT}]`
-        : `bg-gray-200 dark:bg-[#1E293B] text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#2563EB]`
-      }
-    `}
-  >
-    Tags
-  </button>
-</div>
-
-
+          <button
+            onClick={() => setView("tags")}
+            className={`px-5 py-2 rounded-xl hover:cursor-pointer text-sm font-semibold transition-colors
+              ${view === "tags"
+                ? `bg-[${BDU.ACCENT}] text-white dark:bg-[${BDU.ACCENT}]`
+                : `bg-gray-200 dark:bg-[#1E293B] text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-[#2563EB]`
+              }
+            `}
+          >
+            Tags
+          </button>
+        </div> 
       {/* ---------------- CATEGORIES VIEW ---------------- */}
       {view === "categories" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -102,7 +91,7 @@ const CategoryPage = () => {
                 dark:hover:bg-[#2563EB] hover:cursor-pointer
               `}
             >
-              #{tag.id} ({tag.count})
+              {tag.name} ({tag.count})
             </button>
           ))}
         </div>

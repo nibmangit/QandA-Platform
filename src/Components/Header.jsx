@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react";
+import { Mail, Bookmark ,Bell, BellDot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { BDU } from "../utils/css.jsx";
@@ -20,9 +20,8 @@ const Header = ({ unreadCount }) => {
         transition-all
       "
     >
-      <div className="max-w-7xl mx-auto pb-0 pt-2 flex justify-between items-center">
-
-        {/* Logo */}
+      <div className="max-w-7xl mx-auto pb-0 pt-2 flex justify-between items-center pr-2">
+ 
         <div
           className="flex items-center cursor-pointer"
           onClick={() => navigate("/")}
@@ -46,16 +45,13 @@ const Header = ({ unreadCount }) => {
             <span className="hidden lg:inline text-xl">Q & A Connect</span>
           </h1>
         </div> 
-
-        {/* Search */}
+ 
         <div className="hidden md:block w-full max-w-md mx-4">
           <Search show="show" /> 
         </div> 
-
-        {/* Right Side Buttons */}
+ 
         <div className="flex items-center space-x-4">
-
-          {/* Theme Toggle */}
+ 
           <button
             onClick={toggleTheme}
             aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
@@ -74,15 +70,38 @@ const Header = ({ unreadCount }) => {
               <SunIcon className="w-6 h-6 text-[#E6C25F]" />
             )}
           </button>
-
-          {/* Logged In */}
+ 
           {isLoggedIn ? (
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+ 
+              <button
+                onClick={() => navigate("/notifications")}
+                className="relative p-2 rounded-full 
+                         hover:bg-gray-200 dark:hover:bg-[#374151]
+                        bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer"
+                title="Notifications"
+              >
+                {unreadCount > 0 ? (
+                  <BellDot className="text-blue-600" size={22} />
+                ) : (
+                  <Bell className="text-gray-500 dark:text-gray-300" size={22} />
+                )} 
+              </button>
+
+              <button
+                onClick={() => navigate("/bookmarks")}
+                className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151]
+              bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer"
+                title="Bookmarks"
+              >
+                <Bookmark size={24} className="text-[#1E293B] dark:text-[#F1F5F9]" />
+              </button>
 
               {/* Inbox */}
               <button
                 onClick={() => navigate("/inbox")}
-                className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1E293B] transition hover:cursor-pointer"
+                className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151]
+              bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer"
                 title="Inbox"
               >
                 <Mail size={24} className="text-[#1E293B] dark:text-[#F1F5F9]" />

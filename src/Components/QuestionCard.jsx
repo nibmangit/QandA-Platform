@@ -4,21 +4,24 @@ import { findUser, findCategory, formatScore } from "../utils/Find";
 import { BDU, BDU_DARK } from "../utils/css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "./DeleteModal";  
+import { getTagsForQuestion } from "../utils/Find";
+
 
 const QuestionCard = ({ question, onDelete }) => { 
   const navigate = useNavigate();
-  const { currentUser } = useAuth(); // get logged-in user
+  const { currentUser } = useAuth();
   const [isModalOpen, setIsModalOpen]=useState(false);
   const author = findUser(question.authorId);
-  const category = findCategory(question.categoryId);
+  const category = findCategory(question.categoryId); 
+  const questionTagObjects = getTagsForQuestion(question);
   
-  // check if current user is the owner
   const isOwner = currentUser?.id === author.id;
   const handleDelete = ()=>{
    onDelete(question.id);
    setIsModalOpen(false);
   }
+
   return (
     <>
     <div className={`bg-white dark:bg-[#1A2A3A] dark:text-[${BDU_DARK.TEXT}] p-5 rounded-xl shadow-md transition-shadow hover:shadow-lg border border-gray-100 dark:border-[#1E293B]`}>
@@ -57,9 +60,9 @@ const QuestionCard = ({ question, onDelete }) => {
       </p>
 
       <span className="flex flex-wrap m-4">
-        {question.tags?.map((tag) => (
-          <span key={`${question.id}-${tag}`} className="text-xs bg-blue-300 m-2 rounded-full py-1 px-3 dark:text-[#0F172A]">
-            #{tag}
+        {questionTagObjects?.map((tag) => (
+          <span key={`${tag.id}-${tag.name}`} className="text-xs bg-blue-300 m-2 rounded-full py-1 px-3 dark:text-[#0F172A]">
+            #{tag.name}
           </span>
         ))}
       </span> 
