@@ -48,8 +48,7 @@ if (searchText.trim()) {
 
         list = list.filter(item =>
         item.title.toLowerCase().includes(q) ||
-        item.body.toLowerCase().includes(q)
-        // item.tags.some(tag => tag.toLowerCase().includes(q))
+        item.body.toLowerCase().includes(q) 
       );
     }
  

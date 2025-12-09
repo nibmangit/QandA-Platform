@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import {
-  Home as HomeIcon, PlusSquare, BookOpen, Clock, Zap, Shield, User,
+  Home as HomeIcon, PlusSquare, BookOpen,HelpCircle, Zap, Shield, User,
   List, Bell, Mail } from "lucide-react"; 
-import {MOCK_MESSAGES } from "./utils/mock/mockData";
+import {MOCK_MESSAGES, MOCK_QUESTIONS } from "./utils/mock/mockData";
 import { BDU } from "./utils/css";
 
 import Header from "./Components/Header";
@@ -27,11 +27,13 @@ import NotificationsPage from "./pages/NotificationsPage";
 import AnnouncementDetailPage from './pages/AnnouncementDetailPage ';
 import { useAuth } from './context/AuthContext';
 import BookMarkPage from './pages/BookMarkPage';
+import HelpPage from './pages/HelpPage';
 
 const App = () => { 
   const location = useLocation();
   const [isRegistering, setIsRegistering] = useState(false);
   const {currentUser,isLoggedIn} = useAuth()
+  const bookmarkCount = MOCK_QUESTIONS.filter(q => q.is_bookmarked && q.authorId === currentUser?.id).length;
   const unreadCount = MOCK_MESSAGES.filter(
     m => m.receiverId === currentUser?.id && !m.read
   ).length; 
@@ -47,6 +49,7 @@ const App = () => {
     { to: "/dashboard", label: "Dashboard", icon: Shield, requiresAuth: true },
     { to: "/notifications", label: "Notifications", icon: Bell, requiresAuth: true },
     { to: "/announcements", label: "Announcements", icon: Bell }, 
+    { to: "/help", label: "Help", icon: HelpCircle }, 
   ].filter(item => {
     if (item.requiresAuth && !isLoggedIn) return false;
     if (item.adminOnly && currentUser?.role !== "admin") return false;
@@ -72,6 +75,7 @@ const App = () => {
 
        {showHeader && <Header 
           unreadCount={unreadCount}
+          bookmarkCount={bookmarkCount}
         />}
 
         <main className="pt-[76px] pb-10">
@@ -85,15 +89,16 @@ const App = () => {
               <Routes> 
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/questions" element={<AllQuestionsPage />} />
-                <Route path="/question/:id" element={<QuestionDetailsPage />} />
                 <Route path="/categories" element={<CategoryPage />} />
                 <Route path="/reputation" element={<ReputationPage />} /> 
                 <Route path="/announcements" element={<AnnouncementsPage />} />
                 <Route path="/announcements/:announcementId" element={<AnnouncementDetailPage />} /> 
+                <Route path="help" element={<HelpPage />} />
 
                 <Route path="/auth" element={ <AuthPage isRegister={isRegistering} setIsRegister={setIsRegistering}  /> } />
  
                 <Route path="/dashboard" element={isLoggedIn ? ( <Dashboard /> ) : ( <Navigate to="/auth" replace /> )} />
+                <Route path="/questions/:id" element={isLoggedIn ? ( <QuestionDetailsPage /> ) : ( <Navigate to="/auth" replace /> )} />
                 <Route  path="/ask-question"  element={isLoggedIn ? (<AskQuestionPage mode='ask' /> ) : (  <Navigate to="/auth" replace /> )}  />
                 <Route  path="/edit-question/:questionId"  element={isLoggedIn ? (  <AskQuestionPage mode='edit' /> ) : (<Navigate to="/auth" replace /> )} />
                 <Route  path="/profile/:userId"  element={isLoggedIn ? ( <UserProfilePage /> ) : ( <Navigate to="/auth" replace /> )} />

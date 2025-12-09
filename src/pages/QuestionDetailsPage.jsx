@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
-import { Calendar,Bookmark, Edit, Trash2, ThumbsUp, ThumbsDown, MessageSquare, Zap, CornerUpRight, BookOpen, PlusCircle,} from "lucide-react";
+import {Edit, Trash2, ThumbsUp, ThumbsDown, MessageSquare} from "lucide-react";
 import { MOCK_QUESTIONS, MOCK_ANSWERS } from "../utils/mock/mockData";
-import { findCategory, findUser } from "../utils/Find";
+import {findUser } from "../utils/Find";
 import { BDU } from "../utils/css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DeleteModal from "../Components/DeleteModal";
-import StatButton from "../helper/StatButton";
+import QuestionCard from "../Components/QuestionCard"; 
 import ActionButton from "../helper/ActionButton";
 
 const generateUUID = () => crypto.randomUUID().slice(0, 8); 
@@ -26,15 +26,12 @@ const QuestionDetailsPage = ({ onDelete }) => {
   );
 console.log(answers)
   const [answerCount, setAnswerCount] = useState(question?.answers || answers.length);
-
-  const author = findUser(question?.authorId);
-  const category = findCategory(question?.categoryId);
+ 
   const relatedQuestions = MOCK_QUESTIONS.filter(
     (q) => q.id !== questionId && q.categoryId === question?.categoryId
   ).slice(0, 3);
   const [liked, setLiked] = useState(false);
-  const [disliked, setDisliked] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [disliked, setDisliked] = useState(false); 
   const [newAnswer, setNewAnswer] = useState(""); 
   const [commentInputs, setCommentInputs] = useState({}); 
   const [openCommentsFor, setOpenCommentsFor] = useState(null);
@@ -46,11 +43,7 @@ console.log(answers)
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   if (!question) return <div className="p-10 text-center text-red-500">Question not found.</div>;
-
-  const isQuestionOwner = currentUser?.id === question.authorId;
-const handleBookmark = () => {
-    setBookmarked(prev => !prev);
-  };
+ 
   // ----------------- Answer operations -----------------
   const handlePostAnswer = () => {
     if (!newAnswer.trim()) return;
@@ -177,222 +170,223 @@ const handleBookmark = () => {
       setDeleteTarget(null); 
       if (onDelete) onDelete(question.id);
     }
-  };
-
- 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }; 
 
   return (
     <>
       <div className="max-w-7xl mx-auto py-10 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8"> 
           <div className="lg:col-span-3 space-y-8">
-            {/* Question Details */}
-            <div className="bg-white dark:bg-[#1E293B] p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
-              <div className="flex justify-between items-start mb-4">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">{question.title}</h1>
-                  <div className="flex space-x-2">
-                    <button
-                      className="flex items-center text-sm text-yellow-500 hover:text-yellow-600 hover:cursor-pointer"
-                      onClick={handleBookmark}
-                      title="Edit"
-                    >
-                      <Bookmark size={16} fill={bookmarked?"#FBBF24":"none"} />
-                    </button>
-                {isQuestionOwner && 
-                  <>
-                    <button
-                      className="flex items-center text-sm text-yellow-500 hover:text-yellow-600 hover:cursor-pointer"
-                      onClick={() => navigate(`/edit-question/${question.id}`)}
-                      title="Edit"
-                    >
-                      <Edit size={16} className="mr-1" />
-                    </button>
-                    <button
-                      className="flex items-center text-sm text-red-500 hover:text-red-600 hover:cursor-pointer"
-                      onClick={confirmDeleteQuestion}
-                      title="Delete"
-                      >
-                      <Trash2 size={16} className="mr-1" />
-                    </button>
-                      </>
-                   }
-                  </div>
-              </div>
-
-              <p className={`flex font-semibold text-blue-600 dark:text-[#3B82F6]`}>@ {category?.name}</p>
-              <br />
-              <div className="flex items-center space-x-4 mb-4 text-sm text-gray-500 dark:text-gray-400">
-                <img src={author?.avatar} alt={author?.name} className="h-8 w-8 rounded-full object-cover" />
-                <span>
-                  Asked by{" "}
-                  <button onClick={() => navigate(`/profile/${author?.id}`)} className="font-semibold hover:underline hover:cursor-pointer text-blue-600 dark:text-blue-400">
-                    {author?.name}
-                  </button>
-                </span>
-                <span>•</span>
-                <Calendar size={14} />
-                <span>{new Date(question.date).toLocaleDateString()}</span>
-              </div>
-
-              {question.image && (
-                <img src={`/${question.image}`} alt="Question Diagram" className="w-full max-h-80 object-cover rounded-xl my-4 border border-gray-200 dark:border-gray-700" />
-              )}
-
-              <p className="text-base leading-relaxed mb-6 text-gray-900 dark:text-gray-100">{question.body}</p>
-
-              
-              <div className="flex justify-between items-center border-t border-gray-100 dark:border-gray-700 pt-4">
-                <div className="flex space-x-4">
-                  <StatButton filled={liked?"#33BF24":"none"} count={question.likes} icon={ThumbsUp} colorClass="text-green-500" label="Likes" onClick={handleLike} />
-                  <StatButton filled={disliked?"#F00":"none"} count={question.dislikes} icon={ThumbsDown} colorClass="text-red-500" label="Dislikes" onClick={handleDislike} />
-                  <StatButton
-                    count={answerCount}
-                    icon={MessageSquare}
-                    colorClass="text-blue-500"
-                    label="Answers"
-                    onClick={() => setOpenCommentsFor(null) || setOpenCommentsFor("toggle-answers") /* dummy toggle handled below */}
-                  />
-                  <StatButton count={question.dislikes} icon={PlusCircle} colorClass="text-green-500" label="Give Your Answer" onClick={scrollToBottom} />
-                </div>
-              </div>
-            </div>
-
-            {/* Answers List */}
+            <QuestionCard
+              question={question}
+              onDelete={confirmDeleteQuestion}
+              showImage={true}
+              showFullBody={true}
+            />
+ 
             <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {answerCount} {answerCount === 1 ? "Answer" : "Answers"}
-              </h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {answerCount} {answerCount === 1 ? "Answer" : "Answers"}
+                </h3>
 
-              {answers?.map((answer) => (
-                <div key={answer.id} className="relative bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
-                   
-                  {currentUser?.id === answer.authorId && (
-                    <div className="absolute top-4 right-4 flex space-x-2">
-                      <button
-                        className="flex items-center text-sm text-yellow-500 hover:text-yellow-600"
-                        onClick={() => {
-                          setEditingAnswerId(answer.id);
-                          setEditingAnswerText(answer.body);
-                        }}
-                        title="Edit"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        className="flex items-center text-sm text-red-500 hover:text-red-600"
-                        onClick={() => confirmDeleteAnswer(answer.id)}
-                        title="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  )}
+                {answers?.map((answer) => (
+                  <div
+                    key={answer.id}
+                    className="relative bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700"
+                  >
+                    {/* Edit/Delete for own answer */}
+                    {currentUser?.id === answer.authorId && (
+                      <div className="absolute top-4 right-4 flex space-x-2">
+                        <button
+                          className="flex items-center text-sm text-yellow-500 hover:text-yellow-600"
+                          onClick={() => {
+                            setEditingAnswerId(answer.id);
+                            setEditingAnswerText(answer.body);
+                          }}
+                          title="Edit"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          className="flex items-center text-sm text-red-500 hover:text-red-600"
+                          onClick={() => confirmDeleteAnswer(answer.id)}
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
 
-                  {/* Answer body or edit textarea */}
-                  {editingAnswerId === answer.id ? (
-                    <div>
-                      <textarea
-                        value={editingAnswerText}
-                        onChange={(e) => setEditingAnswerText(e.target.value)}
-                        className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100"
-                        rows={4}
-                      />
-                      <div className="mt-2 flex space-x-2">
-                        <button onClick={() => handleEditAnswer(answer.id)} className="px-3 py-1 bg-blue-600 text-white rounded">Save</button>
-                        <button onClick={() => { setEditingAnswerId(null); setEditingAnswerText(""); }} className="px-3 py-1 bg-gray-200 rounded">Cancel</button>
+                    {/* Answer body / Edit textarea */}
+                    {editingAnswerId === answer.id ? (
+                      <div>
+                        <textarea
+                          value={editingAnswerText}
+                          onChange={(e) => setEditingAnswerText(e.target.value)}
+                          className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl dark:bg-[#0F172A] dark:text-gray-100"
+                          rows={4}
+                        />
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            onClick={() => handleEditAnswer(answer.id)}
+                            className="px-3 py-1 bg-blue-600 text-white rounded"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingAnswerId(null);
+                              setEditingAnswerText("");
+                            }}
+                            className="px-3 py-1 bg-gray-200 rounded"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-base leading-relaxed text-gray-900 dark:text-gray-100 mb-4">
+                        {answer.body}
+                      </p>
+                    )}
+
+                    {/* Bottom section: responsive row */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-t border-gray-100 dark:border-gray-700 pt-4">
+                      {/* Author info */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                        <img
+                          src={findUser(answer.authorId).avatar}
+                          alt={findUser(answer.authorId).name}
+                          className="h-6 w-6 rounded-full object-cover"
+                        />
+                        <span>
+                          Answered by{" "}
+                          <span className="font-semibold hover:underline hover:cursor-pointer text-blue-600 dark:text-blue-400">
+                            {findUser(answer.authorId).name}
+                          </span>
+                        </span>
+                        <span className="text-xs">{new Date(answer.date).toLocaleDateString()}</span>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex mt-2 sm:mt-0 space-x-2">
+                        <ActionButton
+                          filled={liked ? "#FBBF24" : "none"}
+                          icon={ThumbsUp}
+                          label={answer.likes}
+                          onClick={handleLike}
+                        />
+                        <ActionButton
+                          filled={disliked ? "#FBBF24" : "none"}
+                          icon={ThumbsDown}
+                          label={answer.dislikes}
+                          onClick={handleDislike}
+                        />
+                        <ActionButton
+                          icon={MessageSquare}
+                          label="Comment"
+                          onClick={() => toggleComments(answer.id)}
+                        />
                       </div>
                     </div>
-                  ) : (
-                    <p className="text-base leading-relaxed text-gray-900 dark:text-gray-100 mb-4">{answer.body}</p>
-                  )}
 
-                  {/* Bottom section */}
-                  <div className="flex justify-between items-center border-t border-gray-100 dark:border-gray-700 pt-4">
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                      <img src={findUser(answer.authorId).avatar} alt={findUser(answer.authorId).name} className="h-6 w-6 rounded-full object-cover" />
-                      <span>
-                        Answered by{" "}
-                        <span className="font-semibold hover:underline hover:cursor-pointer text-blue-600 dark:text-blue-400">
-                          {findUser(answer.authorId).name}
-                        </span>
-                      </span>
-                      <span className="text-xs">{new Date(answer.date).toLocaleDateString()}</span>
-                    </div>
+                    {/* Comments section */}
+                    {openCommentsFor === answer.id && (
+                      <div className="mt-4 p-3 bg-gray-50 dark:bg-[#0F172A] rounded-xl space-y-3">
+                        <p className="text-xs font-semibold border-b border-gray-200 dark:border-gray-700 pb-1 text-gray-500 dark:text-gray-400">
+                          Comments
+                        </p>
 
-                    <div className="flex space-x-2">
-                      <ActionButton filled={liked?"#FBBF24":"none"} icon={ThumbsUp} label={answer.likes} onClick={ handleLike} />
-                      <ActionButton filled={disliked?"#FBBF24":"none"} icon={ThumbsDown} label={answer.dislikes} onClick={handleDislike} />
-                      <ActionButton
-                        icon={MessageSquare}
-                        label="Comment"
-                        onClick={() => toggleComments(answer.id)}
-                      />
-                    </div>
-                  </div>
- 
-                  {openCommentsFor === answer.id && (
-                    <div className="mt-4 p-3 bg-gray-50 dark:bg-[#0F172A] rounded-xl space-y-3">
-                      <p className="text-xs font-semibold border-b border-gray-200 dark:border-gray-700 pb-1 text-gray-500 dark:text-gray-400">Comments</p>
- 
-                      <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                        {answer.comments.length === 0 && <div className="text-gray-500">No comments yet.</div>}
-                        {answer.comments.map((c) => (
-                          <div key={c.id} className="flex items-start justify-between gap-3">
-                            <div>
-                              <div className="text-xs font-semibold text-gray-700 dark:text-gray-200">
-                                {findUser(c.authorId)?.name || "Anonymous"}
-                                <span className="ml-2 text-xs text-gray-500">{new Date(c.date).toLocaleTimeString()}</span>
+                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                          {answer.comments.length === 0 && (
+                            <div className="text-gray-500">No comments yet.</div>
+                          )}
+                          {answer.comments.map((c) => (
+                            <div key={c.id} className="flex flex-col sm:flex-row justify-between gap-3">
+                              <div>
+                                <div className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                                  {findUser(c.authorId)?.name || "Anonymous"}
+                                  <span className="ml-2 text-xs text-gray-500">
+                                    {new Date(c.date).toLocaleTimeString()}
+                                  </span>
+                                </div>
+
+                                {editingCommentId === c.id ? (
+                                  <div className="mt-1">
+                                    <input
+                                      value={editingCommentText}
+                                      onChange={(e) => setEditingCommentText(e.target.value)}
+                                      className="w-full p-2 border rounded dark:bg-[#0F172A] dark:text-gray-100"
+                                    />
+                                    <div className="mt-1 flex gap-2 flex-wrap">
+                                      <button
+                                        className="px-2 py-1 bg-blue-600 text-white rounded"
+                                        onClick={() => handleEditComment(answer.id)}
+                                      >
+                                        Save
+                                      </button>
+                                      <button
+                                        className="px-2 py-1 bg-gray-200 rounded"
+                                        onClick={() => {
+                                          setEditingCommentId(null);
+                                          setEditingCommentText("");
+                                        }}
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="mt-1 text-sm">{c.body}</div>
+                                )}
                               </div>
 
-                              {editingCommentId === c.id ? (
-                                <div className="mt-1">
-                                  <input
-                                    value={editingCommentText}
-                                    onChange={(e) => setEditingCommentText(e.target.value)}
-                                    className="w-full p-2 border rounded dark:bg-[#0F172A] dark:text-gray-100"
-                                  />
-                                  <div className="mt-1 flex gap-2">
-                                    <button className="px-2 py-1 bg-blue-600 text-white rounded" onClick={() => handleEditComment(answer.id)}>Save</button>
-                                    <button className="px-2 py-1 bg-gray-200 rounded" onClick={() => { setEditingCommentId(null); setEditingCommentText(""); }}>Cancel</button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="mt-1 text-sm">{c.body}</div>
-                              )}
+                              <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                                {currentUser?.id === c.authorId && (
+                                  <>
+                                    <button
+                                      title="Edit"
+                                      onClick={() => startEditComment(answer.id, c.id, c.body)}
+                                      className="text-yellow-500"
+                                    >
+                                      <Edit size={14} />
+                                    </button>
+                                    <button
+                                      title="Delete"
+                                      onClick={() => confirmDeleteComment(answer.id, c.id)}
+                                      className="text-red-500"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
                             </div>
+                          ))}
+                        </div>
 
-                            <div className="flex items-center gap-2">
-                              {currentUser?.id === c.authorId && (
-                                <>
-                                  <button title="Edit" onClick={() => startEditComment(answer.id, c.id, c.body)} className="text-yellow-500"><Edit size={14} /></button>
-                                  <button title="Delete" onClick={() => confirmDeleteComment(answer.id, c.id)} className="text-red-500"><Trash2 size={14} /></button>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                        {/* Add comment input */}
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="text"
+                            placeholder="Add a comment..."
+                            value={commentInputs[answer.id] || ""}
+                            onChange={(e) => handleCommentInputChange(answer.id, e.target.value)}
+                            className="flex-1 p-2 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-[#0F172A] dark:text-gray-100"
+                          />
+                          <button
+                            onClick={() => handlePostComment(answer.id)}
+                            className="px-3 py-1 bg-blue-600 text-white rounded"
+                          >
+                            Post
+                          </button>
+                        </div>
                       </div>
+                    )}
+                  </div>
+                ))}
+              </div>
 
-                      {/* Add comment input */}
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder="Add a comment..."
-                          value={commentInputs[answer.id] || ""}
-                          onChange={(e) => handleCommentInputChange(answer.id, e.target.value)}
-                          className="flex-1 p-2 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-[#0F172A] dark:text-gray-100"
-                        />
-                        <button onClick={() => handlePostComment(answer.id)} className="px-3 py-1 bg-blue-600 text-white rounded">Post</button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
 
             {/* Add Answer Form */}
             <div ref={bottomRef} className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">

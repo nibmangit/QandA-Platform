@@ -68,7 +68,8 @@ export const MOCK_QUESTIONS = [
     dislikes: 5,
     answers: 12,
     date: "2025-10-25T10:00:00Z",
-    image: "image.png"
+    image: "image.png",
+    is_bookmarked: true,
   },
 
   {
@@ -81,7 +82,9 @@ export const MOCK_QUESTIONS = [
     likes: 12,
     dislikes: 1,
     answers: 3,
-    date: "2025-10-26T14:30:00Z"
+    date: "2025-10-26T14:30:00Z",
+    image: "image.png",
+    is_bookmarked: true,
   },
 
   {
@@ -89,12 +92,14 @@ export const MOCK_QUESTIONS = [
     title: "Best practices for writing a convincing research proposal for an internal grant?",
     tags: [3,5,2,1],
     categoryId: "cat-bus",
-    authorId: "user-002",
+    authorId: "user-003",
     body: "As a faculty member, what elements does the BDU research review board prioritize?",
     likes: 88,
     dislikes: 2,
     answers: 25,
-    date: "2025-10-27T09:15:00Z"
+    date: "2025-10-27T09:15:00Z",
+    image: "image.png",
+    is_bookmarked: false,
   },
 
   {
@@ -107,7 +112,9 @@ export const MOCK_QUESTIONS = [
     likes: 5,
     dislikes: 0,
     answers: 1,
-    date: "2025-10-28T16:00:00Z"
+    date: "2025-10-28T16:00:00Z",
+    image: "image.png",
+    is_bookmarked: false,
   }
 ];
 

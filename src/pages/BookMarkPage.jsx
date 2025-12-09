@@ -4,7 +4,7 @@ import QuestionCard from "../Components/QuestionCard";
 import { Bookmark } from "lucide-react";
 
 function BookMarkPage(){
-const bookmarks = MOCK_QUESTIONS
+const bookmarks = MOCK_QUESTIONS.filter(q => q.is_bookmarked);
 
     return(
       <div className="max-w-7xl mx-auto py-10 px-4">

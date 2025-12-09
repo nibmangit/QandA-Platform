@@ -33,12 +33,12 @@ const NavItem = ({ label, icon: Icon, isActive, onClick, className = '' }) => {
       `}
     >
       
-      {Icon && typeof Icon === "function" ? (
+      {Icon && (
         <Icon 
           size={20} 
           className="mr-3 shrink-0" 
         />
-      ) : null}
+      ) }
       
       <span>{label}</span>
     </button>

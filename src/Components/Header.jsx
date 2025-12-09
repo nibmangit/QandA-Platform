@@ -5,7 +5,7 @@ import { BDU } from "../utils/css.jsx";
 import Search from "./Search.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const Header = ({ unreadCount }) => {
+const Header = ({ unreadCount, BookmarkCount }) => {
   const { currentUser, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme();
@@ -95,6 +95,11 @@ const Header = ({ unreadCount }) => {
                 title="Bookmarks"
               >
                 <Bookmark size={24} className="text-[#1E293B] dark:text-[#F1F5F9]" />
+                 {BookmarkCount > 0 && (
+                  <span
+                    className="absolute text-green-500 top-0 right-0 block h-3 w-3 rounded-full ">
+                      9</span>
+                      )}
               </button>
 
               {/* Inbox */}
