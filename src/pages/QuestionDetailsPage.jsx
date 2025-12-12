@@ -427,8 +427,7 @@ console.log(answers)
           </div>
         </div>
       </div>
-
-      {/* Delete modal */}
+ 
       <DeleteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleConfirmDelete} />
     </>
   );

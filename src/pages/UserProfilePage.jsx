@@ -2,12 +2,11 @@ import { useState } from "react";
 import { Edit } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { findUser } from "../utils/Find";
-import { MOCK_QUESTIONS, MOCK_ANSWERS, MOCK_BADGES } from "../utils/mock/mockData";
-import QuestionCard from "../Components/QuestionCard";
+import { MOCK_QUESTIONS, MOCK_ANSWERS} from "../utils/mock/mockData"; 
 import ProfileEditModal from "../Components/ProfileEditModal";
-import { useAuth } from "../context/AuthContext";
-import GenerateBadgeIcon from "../Components/GenerateBadgeIcon";
+import { useAuth } from "../context/AuthContext"; 
 import ProfileTabContent from "../Components/ProfielTabContent";
+import { getUserBadges } from "../helper/getUserBadges";
 
 
 const TabButton = ({ name, label, setActiveTab, activeTab }) => (
@@ -22,9 +21,7 @@ const TabButton = ({ name, label, setActiveTab, activeTab }) => (
     {label}
   </button>
 );
-
-
-
+ 
 const UserProfilePage = () => {
   const { currentUser } = useAuth();
   const { userId } = useParams();
@@ -39,9 +36,7 @@ const UserProfilePage = () => {
     ...new Set(MOCK_ANSWERS.filter((a) => a.authorId === profileUser.id).map((a) => a.questionId)),
   ];
   const userAnswers = MOCK_QUESTIONS.filter((q) => userAnsweredQuestionIds.includes(q.id));
-  const userBadges = MOCK_BADGES.filter(badge =>
-  profileUser.badges?.includes(badge.id)
-);
+  const userBadges = getUserBadges(profileUser);
   const handleEditProfile = () => setIsEditing(true);
 
 
@@ -49,13 +44,12 @@ const UserProfilePage = () => {
     <>
       <div className="max-w-4xl mx-auto py-10 px-4">
         <div className="bg-white dark:bg-[#0F172A] p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
-          {/* Profile Header */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 pb-6 border-b border-gray-100 dark:border-gray-700">
             <img
               src={
                 profileUser.avatar
                   ? profileUser.avatar
-                  : `https://placehold.co/100x100/CCDCDC/FFFFFF?text=${profileUser.name.charAt(0)}`
+                  : `https://placehold.co/100x100/CCDCDC/FFFFFF?text=${profileUser.name.charAt(0).toUpperCase()}`
               }
               alt={profileUser.name}
               className="h-24 w-24 rounded-full object-cover ring-4 ring-offset-2 ring-yellow-400"
@@ -81,8 +75,7 @@ const UserProfilePage = () => {
               </button>
             )}
           </div>
-
-          {/* Tabs */}
+ 
           <div className="mt-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div className="flex space-x-3 overflow-x-auto">
               <TabButton name="overview" label="Overview" setActiveTab={setActiveTab} activeTab={activeTab} />
@@ -96,8 +89,7 @@ const UserProfilePage = () => {
               )}
             </div>
           </div>
-
-          {/* Tab Content */}
+ 
           <div className="mt-8">
             <ProfileTabContent 
               activeTab={activeTab}

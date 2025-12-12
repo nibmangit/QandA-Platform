@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { formatScore } from "../utils/Find";
 import {BDU,BDU_DARK} from "../utils/css";
+import { getUserBadges } from "../helper/getUserBadges";
 
 const UserCard = ({ user }) => {
   const navigate = useNavigate()
+  const userBadges = getUserBadges(user);
 
 return(
   <div
@@ -16,7 +18,14 @@ return(
       <p className={`text-xs text-gray-500 dark:text-[${BDU_DARK.GOLD}] `}>
         {formatScore(user.points)} Points
         <span className="ml-2 inline-flex items-center">
-          {user.badges.slice(0, 1).map(b => <span key={b} className="text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">{b}</span>)}
+          {userBadges.slice(0, 1).map(badge => (
+            <span 
+              key={badge.id} 
+              className="text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700"
+            >
+              {badge.name} 
+            </span>
+          ))}
         </span>
       </p>
     </div>

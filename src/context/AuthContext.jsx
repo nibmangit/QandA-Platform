@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   // ---------- LOAD FROM LOCAL STORAGE ----------
   useEffect(() => {
@@ -27,6 +28,7 @@ export const AuthProvider = ({ children }) => {
       }else{
         setIsLoggedIn(false);
       }
+      setIsLoading(false);
     }
 
     loadData();
@@ -40,8 +42,7 @@ export const AuthProvider = ({ children }) => {
 
     saveUsers();
   }, [users]);
-
-  // ---------- LOGIN ----------
+ 
   const login = (email, password) => {
     setError("");
 
@@ -60,8 +61,7 @@ export const AuthProvider = ({ children }) => {
 
     return true;
   };
-
-  // ---------- REGISTER ----------
+ 
   const register = ({ name, email, password }) => {
     setError("");
 
@@ -86,8 +86,7 @@ export const AuthProvider = ({ children }) => {
 
     return true;
   };
-
-  // ---------- LOGOUT ----------
+ 
   const logout = () => {
     setCurrentUser(null);
     setIsLoggedIn(false);
@@ -100,6 +99,7 @@ export const AuthProvider = ({ children }) => {
         users,
         currentUser,
         isLoggedIn,
+        isLoading,
         error,
         setError,
         login,

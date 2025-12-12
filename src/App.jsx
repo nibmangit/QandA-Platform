@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {Home as HomeIcon, PlusSquare, BookOpen,HelpCircle, Zap, Shield, User,
+        List, Bell, Mail } from "lucide-react"; 
 
-import {
-  Home as HomeIcon, PlusSquare, BookOpen,HelpCircle, Zap, Shield, User,
-  List, Bell, Mail } from "lucide-react"; 
 import {MOCK_MESSAGES, MOCK_QUESTIONS } from "./utils/mock/mockData";
 import { BDU } from "./utils/css";
-
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import SideBar from "./Components/SideBar";
-
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
@@ -28,11 +25,19 @@ import AnnouncementDetailPage from './pages/AnnouncementDetailPage ';
 import { useAuth } from './context/AuthContext';
 import BookMarkPage from './pages/BookMarkPage';
 import HelpPage from './pages/HelpPage';
+import { getTitleForPath } from './helper/getTitleForPath';
+import LoadingPage from './pages/LoadingPage';
 
 const App = () => { 
   const location = useLocation();
   const [isRegistering, setIsRegistering] = useState(false);
-  const {currentUser,isLoggedIn} = useAuth()
+  const {currentUser,isLoggedIn, isLoading} = useAuth()
+
+useEffect(() => {
+  const currentTitle = getTitleForPath(location.pathname);
+    document.title = currentTitle;
+  }, [location.pathname]);
+
   const bookmarkCount = MOCK_QUESTIONS.filter(q => q.is_bookmarked && q.authorId === currentUser?.id).length;
   const unreadCount = MOCK_MESSAGES.filter(
     m => m.receiverId === currentUser?.id && !m.read
@@ -51,8 +56,7 @@ const App = () => {
     { to: "/announcements", label: "Announcements", icon: Bell }, 
     { to: "/help", label: "Help", icon: HelpCircle }, 
   ].filter(item => {
-    if (item.requiresAuth && !isLoggedIn) return false;
-    if (item.adminOnly && currentUser?.role !== "admin") return false;
+    if (item.requiresAuth && !isLoggedIn) return false; 
     return true;
   });
 
@@ -62,6 +66,10 @@ const App = () => {
   const showFooter = !hiddenFooterPaths.includes(location.pathname);
 
   const isFullScreenPage = location.pathname === "/notfound" || location.pathname === "/auth";
+
+  if (isLoading) {
+        return ( <LoadingPage />);
+    }
 
   return (  
       <div
@@ -86,7 +94,7 @@ const App = () => {
             (<SideBar sidebarNavItems={sidebarNavItems}  >
             <div className="flex-1 min-w-0 mt-6 lg:mt-0 px-4 lg:px-8">
 
-              <Routes> 
+              <Routes>  
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/questions" element={<AllQuestionsPage />} />
                 <Route path="/categories" element={<CategoryPage />} />
@@ -105,8 +113,7 @@ const App = () => {
                 <Route path="/inbox" element={isLoggedIn ? ( <InboxPage /> ) : ( <Navigate to="/auth" replace /> )}  />
                 <Route  path="/notifications"  element={isLoggedIn ? ( <NotificationsPage /> ) : ( <Navigate to="/auth" replace />  )} />
                 <Route  path="/bookmarks"  element={isLoggedIn ? ( <BookMarkPage /> ) : ( <Navigate to="/auth" replace />  )} />
-
-                {/* 404 */}
+ 
                 <Route path="*" element={<Navigate to="/notfound" replace />} />
 
               </Routes>

@@ -8,7 +8,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 const Header = ({ unreadCount, BookmarkCount }) => {
   const { currentUser, isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme();
+  const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme(); 
 
   return (
     <header
@@ -129,7 +129,7 @@ const Header = ({ unreadCount, BookmarkCount }) => {
                     src={
                       currentUser.avatar
                         ? currentUser.avatar
-                        : `https://placehold.co/100x100/A0E7E5/003366?text=${currentUser.name.charAt(0)}`
+                        : `https://placehold.co/100x100/4f06e5/ffffff?text=${currentUser.name?.charAt(0).toUpperCase()}`
                     }
                     className="h-8 w-8 rounded-full object-cover"
                   /> 
