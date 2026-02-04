@@ -5,7 +5,6 @@ import { BDU } from "../utils/css";
 const ProfileEditModal = ({ user, onClose }) => {
   const [formData, setFormData] = useState({
     name: user.name,
-    email: user.email,
     bio: user.bio,
     avatar: user.avatar 
   }); 
@@ -74,23 +73,7 @@ const ProfileEditModal = ({ user, onClose }) => {
                    onChange={handleChange}
                    className="flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-[#FDB813] dark:bg-[#0F172A] dark:text-gray-100 dark:border-gray-600 transition-colors"
                  />
-               </div> 
-       
-               <div className="flex items-center space-x-4">
-                 <label 
-                   className="w-24 text-sm font-medium dark:text-gray-200 text-gray-700"
-                   htmlFor="email"
-                 >
-                   Email
-                 </label>
-                 <input 
-                   id="email"
-                   type="email" 
-                   value={formData.email} 
-                   onChange={handleChange}
-                   className="flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-[#FDB813] dark:bg-[#0F172A] dark:text-gray-100 dark:border-gray-600 transition-colors"
-                 />
-               </div>
+               </div>  
        
                <div className="flex items-start space-x-4">
                  <label 
@@ -107,12 +90,14 @@ const ProfileEditModal = ({ user, onClose }) => {
                    className="flex-1 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-[#FDB813] dark:bg-[#0F172A] dark:text-gray-100 dark:border-gray-600 resize-none transition-colors"
                  ></textarea>
                </div>
+
+               
  
-               <div 
+               {/* <div 
                  className="p-4 rounded-md text-xs dark:bg-blue-600 font-medium dark:text-gray-300" 
-               > 
+               >  
                  <input type="file" className="w-full" />
-               </div>
+               </div> */}
              </div> 
 
              <div className="p-6 pt-0 flex justify-end space-x-3">

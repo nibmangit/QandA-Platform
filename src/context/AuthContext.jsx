@@ -1,102 +1,108 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { MOCK_USERS } from "../utils/mock/mockData";
+import { loginUser, registerUser, getProfile } from "../api/authService";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [users, setUsers] = useState(MOCK_USERS);
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // ---------- LOAD FROM LOCAL STORAGE ----------
+  // ---------- LOAD USER FROM LOCAL STORAGE ----------
   useEffect(() => {
-    async function loadData() {
+    async function loadUser() {
       const savedUser = localStorage.getItem("currentUser");
-      const savedUsers = localStorage.getItem("users");
+      const accessToken = localStorage.getItem("accessToken");
 
-      if (savedUsers) {
-        setUsers(JSON.parse(savedUsers));
-      } else {
-        setUsers(MOCK_USERS);
+      if (savedUser && accessToken) {
+        try {
+          const user = JSON.parse(savedUser);
+          setCurrentUser(user);
+          setIsLoggedIn(true);
+        } catch (err) {
+          console.error("Invalid localStorage user data, clearing it");
+          localStorage.removeItem("currentUser");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        }
       }
 
-      if (savedUser) {
-        setCurrentUser(JSON.parse(savedUser));
-        setIsLoggedIn(true);
-      }else{
-        setIsLoggedIn(false);
-      }
       setIsLoading(false);
     }
 
-    loadData();
+    loadUser();
   }, []);
 
-  // ---------- SAVE USERS ----------
-  useEffect(() => {
-    async function saveUsers() {
-      localStorage.setItem("users", JSON.stringify(users));
-    }
-
-    saveUsers();
-  }, [users]);
- 
-  const login = (email, password) => {
+  // ---------- LOGIN ----------
+  const login = async (email, password) => {
     setError("");
+    setIsLoading(true);
+    try {
+      const data = await loginUser(email, password); 
+      if (!data.access || !data.refresh) {
+        throw { detail: "Login failed: no tokens returned" };
+      }
+ 
+      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("refreshToken", data.refresh); 
 
-    const user = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password.toLowerCase() === password.toLowerCase()
-    );
-
-    if (!user) {
-      setError("Invalid email or password!");
+      const user = await getProfile();
+      localStorage.setItem("currentUser", JSON.stringify(user));
+ 
+      setCurrentUser(user);
+      setIsLoggedIn(true);
+      setIsLoading(false);
+ 
+      return true;
+    } catch (err) { 
+      setError(err.detail || "Login failed");
+      setIsLoading(false);
       return false;
     }
-
-    setCurrentUser(user);
-    setIsLoggedIn(true);
-    localStorage.setItem("currentUser", JSON.stringify(user));
-
-    return true;
   };
- 
-  const register = ({ name, email, password }) => {
-    setError("");
 
-    if (users.some((u) => u.email === email)) {
-      setError("Email already exists!");
+  // ---------- REGISTER ----------
+  const register = async ({ name, email, password }) => {
+    setError("");
+    setIsLoading(true);
+    try { 
+      await registerUser({ name, email, password });
+
+      setIsLoading(false);
+      console.log("Registration successful. Please log in.");
+      return true;
+    } catch (err) {
+      console.error("Register error:", err);
+      setError(err.detail || "Registration failed");
+      setIsLoading(false);
       return false;
     }
-
-    const newUser = {
-      id: "user-" + Date.now(),
-      name,
-      email,
-      password,
-      role: "student",
-    };
-
-    setUsers((prev) => [...prev, newUser]);
-    setCurrentUser(newUser);
-    setIsLoggedIn(true);
-
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-    return true;
   };
- 
+
+  // ---------- LOGOUT ----------
   const logout = () => {
     setCurrentUser(null);
     setIsLoggedIn(false);
     localStorage.removeItem("currentUser");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+  };
+
+  // ---------- REFRESH PROFILE ----------
+  const refreshProfile = async () => {
+    try {
+      const user = await getProfile();
+      setCurrentUser(user);
+      localStorage.setItem("currentUser", JSON.stringify(user));
+    } catch (err) {
+      console.error("Failed to refresh profile:", err);
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        users,
         currentUser,
         isLoggedIn,
         isLoading,
@@ -105,6 +111,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        refreshProfile,
       }}
     >
       {children}

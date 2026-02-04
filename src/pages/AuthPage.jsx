@@ -25,7 +25,7 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
       return;
     }
     const success = register({ name, email, password });
-    if (success) navigate("/");
+    if (success) setIsRegister(false);
   };
 
   return (
