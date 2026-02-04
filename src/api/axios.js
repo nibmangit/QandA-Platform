@@ -8,14 +8,23 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("accessToken"); 
+  const publicEndpoints = [
+    "/user/register/",
+    "/user/login/",
+    "/user/top-users/",
+  ];
+ 
+  const urlPath = config.url.replace(config.baseURL, "");
+  const isPublic = publicEndpoints.some((endpoint) => urlPath.includes(endpoint));
 
-  // 🔹 Skip token for register and login
-  if (token && !config.url.includes("/user/register") && !config.url.includes("/user/login")) {
+  if (token && !isPublic) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log("Authorization header added:", config.headers.Authorization);
   }
 
   return config;
 });
+
 
 export default api;

@@ -3,10 +3,11 @@ import { Zap } from "lucide-react";
 import { formatScore } from "../utils/Find";
 import { useNavigate } from "react-router-dom";
 import BadgeDisplay from "../Components/BadgeDisplay";
+import { useTopUsers } from "../context/topUserContext";
   
 const ReputationPage = () => {
   const navigate = useNavigate();
-  const sortedUsers = MOCK_USERS.sort((a, b) => b.points - a.points);
+  const {topUsers} = useTopUsers();
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
@@ -22,7 +23,7 @@ const ReputationPage = () => {
           </h3>
 
           <div className="space-y-3">
-            {sortedUsers.map((user, index) => (
+            {topUsers?.map((user, index) => (
               <div
                 key={user.id}
                 className={`flex items-center p-3 rounded-xl ${
@@ -46,7 +47,9 @@ const ReputationPage = () => {
                 </span>
 
                 <img
-                  src={user.avatar}
+                  src={user.avatar? user.avatar
+                    : `https://placehold.co/100x100/4f06e5/ffffff?text=${user.name?.charAt(0).toUpperCase()}`
+                  }
                   alt={user.name}
                   className="h-8 w-8 rounded-full object-cover mr-3"
                 />

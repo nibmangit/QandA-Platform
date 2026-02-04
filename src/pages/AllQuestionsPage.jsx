@@ -7,6 +7,7 @@ import UserCard from "../Components/UserCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import Search from "../Components/Search";
 import { useQuestions } from "../context/QuestionContext";
+import { useTopUsers } from "../context/topUserContext";
 
  const SortButton = ({ label, value, sortBy, setSortBy }) => (
 
@@ -22,6 +23,7 @@ import { useQuestions } from "../context/QuestionContext";
   );
 const AllQuestionsPage = () => {
   const navigate = useNavigate();
+  const {topUsers} = useTopUsers();
   const [sortBy, setSortBy] = useState('newest');
   const [filterCategory, setFilterCategory] = useState(null);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -192,7 +194,7 @@ if (searchText.trim()) {
             <h4 className={`text-xl text-[${BDU.NAVY}] dark:text-[${BDU_DARK.TEXT}] font-bold mb-4 flex items-center`}>
                Top Contributors</h4>
             <div className="space-y-3">
-              {MOCK_USERS.sort((a, b) => b.points - a.points).slice(0, 3).map(user => <UserCard key={user.id} user={user} />)}
+              {topUsers.sort((a, b) => b.points - a.points).slice(0, 3).map(user => <UserCard key={user.id} user={user} />)}
             </div>
           </div>
 

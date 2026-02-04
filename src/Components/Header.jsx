@@ -33,15 +33,10 @@ const Header = ({ unreadCount, BookmarkCount }) => {
               alt="BDU Logo"
               className="h-full w-full object-contain"
             />
-          </div>
-
-          {/* Responsive Logo Text */}
+          </div> 
           <h1 className="ml-2 font-bold text-[#2563EB] dark:text-[#3B82F6]">
-            {/* Mobile: hidden */}
             <span className="block md:hidden"></span>
-            {/* Tablet: Q & A */}
             <span className="hidden md:inline lg:hidden text-lg">Q & A</span>
-            {/* Desktop: Q & A Connect */}
             <span className="hidden lg:inline text-xl">Q & A Connect</span>
           </h1>
         </div> 

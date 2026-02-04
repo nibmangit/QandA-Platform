@@ -5,13 +5,14 @@ import { BDU, BDU_DARK } from "../utils/css";
 import UserCard from "../Components/UserCard";
 import { MOCK_QUESTIONS, MOCK_USERS,MOCK_ANNOUNCEMENTS } from "../utils/mock/mockData";
 import { useNavigate } from "react-router-dom"; 
+import { useTopUsers } from "../context/topUserContext";
  
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const trendingQuestions = MOCK_QUESTIONS.sort((a, b) => b.likes - a.likes).slice(0, 4);
-  const topStudents = MOCK_USERS.sort((a, b) => b.points - a.points).slice(0, 5);
- 
+  const {topUsers} = useTopUsers();
+  
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">   
     <div className="relative w-full overflow-hidden rounded-2xl shadow-xl mb-12">
@@ -85,7 +86,7 @@ const LandingPage = () => {
               <TrendingUp size={20} className="mr-2" /> Top Students
             </h4>
             <div className={`space-y-3  `}>
-              {topStudents.map(user => <UserCard key={user.id} user={user}/>)}
+              {topUsers?.map(user => <UserCard key={user.id} user={user}/>)}
               <button
                 onClick={() => navigate('/reputation')}
                 className={`w-full text-sm hover:bg-gray-200 dark:hover:bg-[#4475c5]

@@ -99,11 +99,17 @@ export const AuthProvider = ({ children }) => {
       console.error("Failed to refresh profile:", err);
     }
   };
+  const updateCurrentUser = (updatedUser) => {
+  setCurrentUser(updatedUser);
+  localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+};
+
 
   return (
     <AuthContext.Provider
       value={{
         currentUser,
+        updateCurrentUser,
         isLoggedIn,
         isLoading,
         error,
