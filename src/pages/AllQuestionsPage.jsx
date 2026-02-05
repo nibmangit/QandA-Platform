@@ -1,6 +1,5 @@
-import { useState, useMemo } from "react";
-import { List,PanelLeftClose,PanelLeftOpen } from "lucide-react";
-import { MOCK_QUESTIONS, MOCK_CATEGORIES, MOCK_USERS } from "../utils/mock/mockData";
+import { useState, useMemo, useEffect } from "react";
+import { List,PanelLeftClose,PanelLeftOpen } from "lucide-react"; 
 import { BDU,BDU_DARK } from "../utils/css";
 import QuestionCard from "../Components/QuestionCard";
 import UserCard from "../Components/UserCard";
@@ -8,6 +7,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Search from "../Components/Search";
 import { useQuestions } from "../context/QuestionContext";
 import { useTopUsers } from "../context/topUserContext";
+import { getCategories, getQuestions } from "../api/questionService";
+import { getCategoryEmoji } from "../helper/categoryIcons";
+import LoadingPage from "./LoadingPage";
 
  const SortButton = ({ label, value, sortBy, setSortBy }) => (
 
@@ -31,14 +33,37 @@ const AllQuestionsPage = () => {
   const location = useLocation();
   const tagFilter = location.state?.filterTag || null;
   const categoryFilter = location.state?.filterCategory || null;
+  const [categories, setCategories] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        setLoading(true);
+        const catData = await getCategories(); 
+        setCategories(catData);
+
+        const questionData = await getQuestions(); 
+        setQuestions(questionData.results);
+        
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAll();
+  },[]);
  const filteredQuestions = useMemo(() => {
-  let list = [...MOCK_QUESTIONS];
+  let list = [...questions];
  
   if (categoryFilter) {
-    list = list.filter(q => q.categoryId === categoryFilter);
+    list = list.filter(q => String(q.category) === String(categoryFilter));
   }
   if (filterCategory) {
-    list = list.filter(q => q.categoryId === filterCategory);
+    list = list.filter(q => String(q.category) === String(filterCategory));
   }
   
   if (tagFilter) {
@@ -63,7 +88,7 @@ if (searchText.trim()) {
     default:
       return list.sort((a, b) => new Date(b.date) - new Date(a.date));
   }
-}, [sortBy, categoryFilter,filterCategory, searchText,tagFilter]);
+}, [sortBy, categoryFilter,filterCategory, searchText, questions, tagFilter]);
 
  
 
@@ -74,6 +99,7 @@ if (searchText.trim()) {
         <List size={28} className="inline mr-2" /> All Community Questions
       </h2>
 
+      {loading? <LoadingPage message="Loading Questions..." isFullPage={false} /> :
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
       
         {/* Questions List */}
@@ -133,16 +159,16 @@ if (searchText.trim()) {
                           ${!filterCategory ? `bg-gray-100 font-semibold dark:bg-[#3B82F6] ` : `hover:bg-gray-50 dark:hover:bg-[#3B82F6] hover:cursor-pointer`}`}
                         
                       >
-                        All Categories ({MOCK_QUESTIONS.length})
+                        All Categories ({questions.length})
                       </button>
-                      {MOCK_CATEGORIES.map(c => (
+                      {categories.map(c => (
                         <button
                           key={c.id}
                           onClick={() =>{ setFilterCategory(c.id) ; setIsCategoryOpen(false);}}
                           className={`w-full text-left p-2 rounded-xl transition-colors dark:text-white flex justify-between items-center 
                             ${filterCategory === c.id ? `bg-gray-100 text-[${BDU.TEXT}] font-semibold dark:bg-[#3B82F6] dark:text-[#1d1818]` : `hover:bg-gray-50 dark:hover:bg-[#3B82F6] hover:cursor-pointer`}`}
                         >
-                          {c.icon} {c.name}
+                          {getCategoryEmoji(c.icon)} {c.name}
                           <span className="text-xs font-normal opacity-70">{c.count}</span>
                         </button>
                       ))}
@@ -166,16 +192,16 @@ if (searchText.trim()) {
                 className={`w-full text-left dark:text-white p-2 rounded-xl transition-colors 
                           ${!filterCategory ? `bg-gray-100 font-semibold dark:bg-[#3B82F6] ` : `hover:bg-gray-50 dark:hover:bg-[#3B82F6] hover:cursor-pointer`}`}
               >
-                All Categories ({MOCK_QUESTIONS.length})
+                All Categories ({questions.length})
               </button>
-              {MOCK_CATEGORIES.map(c => (
+              {categories.map(c => (
                 <button
                   key={c.id}
                   onClick={() => setFilterCategory(c.id)}
                   className={`w-full text-left p-2 rounded-xl transition-colors dark:text-white flex justify-between items-center 
                             ${filterCategory === c.id ? `bg-gray-100 text-[${BDU.TEXT}] font-semibold dark:bg-[#3B82F6] dark:text-[#1d1818]` : `hover:bg-gray-50 dark:hover:bg-[#3B82F6] hover:cursor-pointer`}`}
                 >
-                  {c.icon} {c.name}
+                  {getCategoryEmoji(c.icon)} {c.name}
                   <span className="text-xs font-normal opacity-70">{c.count}</span>
                 </button>
               ))}
@@ -199,7 +225,7 @@ if (searchText.trim()) {
           </div>
 
         </div>
-      </div>
+      </div>}
     </div>
   );
 };

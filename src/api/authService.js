@@ -1,8 +1,9 @@
-import api from "./axios";
+import api from "./axiosPrivate";
+import apiPublic from "./axiosPublic";
  
 export const loginUser = async (email, password) => {
   try {
-    const response = await api.post("/user/login/", { email, password });
+    const response = await apiPublic.post("/user/login/", { email, password });
     return response.data; 
   } catch (error) {
     throw error.response?.data || { detail: "Login failed" };
@@ -12,7 +13,7 @@ export const loginUser = async (email, password) => {
 // POST /auth/register/
 export const registerUser = async ({ name, email, password }) => {
   try {
-    const response = await api.post("/user/register/", { name, email, password });
+    const response = await apiPublic.post("/user/register/", { name, email, password });
     return response.data;
   } catch (error) {
     throw error.response?.data || { detail: "Registration failed" };

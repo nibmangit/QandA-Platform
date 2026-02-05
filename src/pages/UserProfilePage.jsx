@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Edit } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { findUser } from "../utils/Find";
+import { findUserById } from "../api/userServiece";
 import { MOCK_QUESTIONS, MOCK_ANSWERS} from "../utils/mock/mockData"; 
 import ProfileEditModal from "../Components/ProfileEditModal";
 import { useAuth } from "../context/AuthContext"; 
 import ProfileTabContent from "../Components/ProfielTabContent";
 import { getUserBadges } from "../helper/getUserBadges";
+import LoadingPage from "./LoadingPage";
 
 
 const TabButton = ({ name, label, setActiveTab, activeTab }) => (
@@ -23,12 +24,35 @@ const TabButton = ({ name, label, setActiveTab, activeTab }) => (
 );
  
 const UserProfilePage = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, isLoading } = useAuth();
   const { userId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
-  const profileUser = findUser(userId) || currentUser;
+  const [profileUser, setProfileUser] = useState(null); 
+ 
+useEffect(() => {
+    const fetchProfileUser = async () => {
+      if (!currentUser) return; // wait until currentUser is loaded
+
+      const isCurrent = userId === currentUser.id;
+      try {
+        if (isCurrent || !userId) {
+          setProfileUser(currentUser);
+        } else {
+          const user = await findUserById(userId);
+          setProfileUser(user);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchProfileUser();
+  }, [currentUser, userId]);
+  
+  if (isLoading || !currentUser || !profileUser) return <LoadingPage />; 
+
   const isCurrentUser = currentUser.id === profileUser.id;
 
   const userQuestions = MOCK_QUESTIONS.filter((q) => q.authorId === profileUser.id);
@@ -39,7 +63,6 @@ const UserProfilePage = () => {
   const userBadges = getUserBadges(profileUser);
   const handleEditProfile = () => setIsEditing(true);
 
-
   return (
     <>
       <div className="max-w-4xl mx-auto py-10 px-4">
@@ -49,7 +72,7 @@ const UserProfilePage = () => {
               src={
                 profileUser.avatar
                   ? profileUser.avatar
-                  : `https://placehold.co/100x100/CCDCDC/FFFFFF?text=${profileUser.name.charAt(0).toUpperCase()}`
+                  : `https://placehold.co/100x100/4f06e5/ffffff?text=${profileUser.name.charAt(0).toUpperCase()}`
               }
               alt={profileUser.name}
               className="h-24 w-24 rounded-full object-cover ring-4 ring-offset-2 ring-yellow-400"

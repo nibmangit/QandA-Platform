@@ -1,14 +1,29 @@
-import {useState } from "react";
+import {useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MOCK_CATEGORIES,MOCK_QUESTIONS, MOCK_TAGS } from "../utils/mock/mockData";
 import { BookOpen, Tags } from "lucide-react";
 import { BDU, BDU_DARK } from "../utils/css";
 import useTagsWithCount from "../helper/useTagsWithCount"
+import { getCategories } from "../api/questionService";
+import { getCategoryEmoji } from "../helper/categoryIcons";
 
 const CategoryPage = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("categories"); 
+  const [categories, setCategories] = useState([]);
   const tags = useTagsWithCount();
+
+  useEffect(()=> {
+    const fetchCategories = async () =>{
+      try{
+        const response = await getCategories();
+        setCategories(response);
+      }catch(error){
+        console.error("Failed to fetch categories:", error);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
@@ -48,7 +63,7 @@ const CategoryPage = () => {
       {/* ---------------- CATEGORIES VIEW ---------------- */}
       {view === "categories" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MOCK_CATEGORIES.map((cat) => (
+          {categories?.map((cat) => (
             <button
               key={cat.id}
               onClick={() =>
@@ -59,7 +74,9 @@ const CategoryPage = () => {
                 hover:scale-[1.03] hover:shadow-2xl hover:cursor-pointer`}
             >
               <div className="flex items-center space-x-4">
-                <span className={`text-4xl text-[${BDU.NAVY}]`}>{cat.icon}</span>
+                <span className={`text-4xl text-[${BDU.NAVY}]`}>{
+                  getCategoryEmoji(cat.icon)
+              }</span>
                 <div>
                   <h3
                     className={`text-xl font-bold text-[${BDU.NAVY}] dark:text-[#2563EB]`}

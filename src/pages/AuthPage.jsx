@@ -11,21 +11,61 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const success = login(email, password);
-    if (success) navigate("/");
+    setError("");
+    if (!email || !password) {
+      setError("Please fill out all input fields!");
+      return;
+    }
+    try{
+      setIsLoading(true);
+      const response = await login(email, password);
+      console.log("Login response:", response);
+      if(response){
+       navigate("/dashboard"); 
+      } 
+    } catch {
+      setError("Invalid email or password.");
+    }finally{
+      setIsLoading(false);
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
     if (!name || !email || !password) {
       setError("Please fill out all input fields!");
       return;
     }
-    const success = register({ name, email, password });
-    if (success) setIsRegister(false);
+      if (!/^[A-Za-z\s]{2,}$/.test(name)) {
+    setError("Name must be at least 2 letters and contain only letters.");
+    return;
+  }
+ 
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setError("Please enter a valid email address.");
+    return;
+  }
+ 
+  if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password)) {
+    setError(
+      "Password must be at least 6 characters and include letters and numbers."
+    );
+    return;
+  }
+  try{
+    setIsLoading(true);
+    const response = await register({ name, email, password });
+     if(response) {setIsRegister(false)};
+  }catch {
+    setError("Registration failed. Email may already be in use.");  
+  }finally{
+    setIsLoading(false);
+  }
   };
 
   return (
@@ -108,7 +148,7 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
               className="w-full py-3 mt-4 text-white font-bold rounded-xl shadow-md hover:opacity-90 hover:scale-[1.02] transition transform"
               style={{ backgroundColor: BDU.ACCENT }}
             >
-              {isRegister ? "Register" : "Login"}
+              {isLoading ? "Processing..." : isRegister ? "Register" : "Login"}
             </button>
           </form>
 

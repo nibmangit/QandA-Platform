@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {ThumbsUp,ThumbsDown,MessageSquare,Edit,Trash2, Bookmark, } from "lucide-react";
-import {findUser, findCategory, formatScore, getTagsForQuestion, } from "../utils/Find";
+import {formatScore, getTagsForQuestion, } from "../utils/Find";
 import { BDU, BDU_DARK } from "../utils/css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DeleteModal from "./DeleteModal";
+import { findUserByEmail } from "../api/userServiece";
+import { getCategoriesById } from "../api/questionService";
 
 const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = false }) => {
   const navigate = useNavigate();
@@ -13,12 +15,38 @@ const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = fa
   const [isBookmarked, setIsBookmarked] = useState(question.is_bookmarked);
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
+  const [author, setAuthor] = useState(null);
+  const [category, setCategory] = useState(null);
 
-  const author = findUser(question.authorId);
-  const category = findCategory(question.categoryId);
+  useEffect(() => {
+    const fetchAuthor = async () => {
+      try {
+        const user = await findUserByEmail(question.author); 
+        setAuthor(user);
+      } catch (error) {
+        console.error("Error fetching author:", error);
+        setAuthor({name:"Deleted User", avatar:"/default-avatar.png"});
+      }
+    };
+
+    if(question.author) { fetchAuthor(); };
+  }, [question.author]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategoriesById(question.category); 
+        setCategory(response);
+      } catch (error) {
+        console.error("Failed to fetch category:", error);
+      }
+    };
+    if(question.category) { fetchCategories(); }  
+  },[question.category]); 
+   
   const questionTagObjects = getTagsForQuestion(question);
 
-  const isOwner = currentUser?.id === author.id;
+  const isOwner = isLoggedIn && currentUser?.id === author?.id;
 
   const handleDelete = () => {
     onDelete(question.id);
@@ -52,7 +80,7 @@ const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = fa
             onClick={()=> navigate(`/questions/${question.id}`)}
           >
             {question.title}
-            <p className={`font-semibold text-blue-600 dark:text-[${BDU_DARK.ACCENT}]`}>@ {category.name}</p>
+            <p className={`font-semibold text-blue-600 dark:text-[${BDU_DARK.ACCENT}]`}>@ {category?.name}</p>
           </h3>
 
           <div className="flex space-x-2">
@@ -127,9 +155,9 @@ const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = fa
 
           {/* Right */}
           <div className="flex items-center mt-2 sm:mt-0 justify-end w-full sm:w-auto">
-            <img src={author.avatar} alt={author.name} className="h-6 w-6 rounded-full mr-2 object-cover hover:cursor-pointer" />
-            <span className="hover:cursor-pointer hover:underline" onClick={() => navigate(`/profile/${author.id}`)}>{author.name}</span>
-            <span className="ml-3 text-xs">{new Date(question.date).toLocaleDateString()}</span>
+            <img src={author?.avatar} alt={author?.name} className="h-6 w-6 rounded-full mr-2 object-cover hover:cursor-pointer" />
+            <span className="hover:cursor-pointer hover:underline" onClick={() => navigate(`/profile/${author?.id}`)}>{author?.name}</span>
+            <span className="ml-3 text-xs">{new Date(question.updated_at).toLocaleDateString()}</span>
           </div>
         </div>
       </div>
