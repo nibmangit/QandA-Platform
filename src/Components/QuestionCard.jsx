@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import {ThumbsUp,ThumbsDown,MessageSquare,Edit,Trash2, Bookmark, } from "lucide-react";
-import {formatScore, getTagsForQuestion, } from "../utils/Find";
+import {formatScore } from "../utils/Find";
 import { BDU, BDU_DARK } from "../utils/css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import DeleteModal from "./DeleteModal";
 import { findUserByEmail } from "../api/userServiece";
-import { getCategoriesById } from "../api/questionService";
+import { getCategoriesById, getTags } from "../api/questionService";
 
 const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = false }) => {
+  console.log("Questions", question);
   const navigate = useNavigate();
   const { currentUser, isLoggedIn } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,11 +18,14 @@ const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = fa
   const [isDisliked, setIsDisliked] = useState(false);
   const [author, setAuthor] = useState(null);
   const [category, setCategory] = useState(null);
+  const [allTags, setAllTags] = useState([]);
+  const [questionTags, setQuestionTags] = useState([]);
 
   useEffect(() => {
     const fetchAuthor = async () => {
       try {
-        const user = await findUserByEmail(question.author); 
+        const user = await findUserByEmail(question.author);
+        console.log("Fetched author:", user);
         setAuthor(user);
       } catch (error) {
         console.error("Error fetching author:", error);
@@ -43,8 +47,32 @@ const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = fa
     };
     if(question.category) { fetchCategories(); }  
   },[question.category]); 
-   
-  const questionTagObjects = getTagsForQuestion(question);
+  
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const data = await getTags();
+        setAllTags(data);
+      } catch (err) {
+        console.error("Failed to load tags", err);
+      }
+    };
+    loadTags();
+  }, []);
+
+  useEffect(() => {
+    if(!question.tags || allTags.length === 0) return;
+    const findQusetionTags = async () => {
+      try{
+      const mapped = allTags.filter(tag => question.tags.includes(tag.id) || question.tags.includes(tag.name));
+      setQuestionTags(mapped);
+      }catch{
+        console.error("Failed to map question tags");
+       setQuestionTags([]);
+      }
+    }
+    findQusetionTags(); 
+  }, [question, allTags]);   
 
   const isOwner = isLoggedIn && currentUser?.id === author?.id;
 
@@ -128,7 +156,7 @@ const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = fa
 
         {/* Tags */}
         <span className="flex flex-wrap m-4">
-          {questionTagObjects?.map(tag => (
+          {questionTags?.map(tag => (
             <span key={`${tag.id}-${tag.name}`} className="text-xs bg-blue-300 m-2 rounded-full py-1 px-3 dark:text-[#0F172A]">
               #{tag.name}
             </span>
@@ -149,13 +177,21 @@ const QuestionCard = ({ question, onDelete, showImage = false, showFullBody = fa
             </div>
             <div className="flex items-center space-x-1">
               <MessageSquare size={16} className={`text-[${BDU.ACCENT}]`} />
-              <span className="font-semibold">{question.answers} Answers</span>
+              <span className="font-semibold">{question.answers_count} Answers</span>
             </div>
           </div>
 
           {/* Right */}
           <div className="flex items-center mt-2 sm:mt-0 justify-end w-full sm:w-auto">
-            <img src={author?.avatar} alt={author?.name} className="h-6 w-6 rounded-full mr-2 object-cover hover:cursor-pointer" />
+            <img 
+              src={
+               author?.avatar 
+                  ? author.avatar 
+                  : author?.name 
+                    ? `https://placehold.co/100x100/4f06e5/ffffff?text=${author.name.charAt(0).toUpperCase()}`
+                    : `https://placehold.co/100x100/4f06e5/ffffff?text=?` 
+              }
+             alt={author?.name} className="h-6 w-6 rounded-full mr-2 object-cover hover:cursor-pointer" />
             <span className="hover:cursor-pointer hover:underline" onClick={() => navigate(`/profile/${author?.id}`)}>{author?.name}</span>
             <span className="ml-3 text-xs">{new Date(question.updated_at).toLocaleDateString()}</span>
           </div>

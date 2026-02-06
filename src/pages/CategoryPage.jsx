@@ -2,16 +2,18 @@ import {useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MOCK_CATEGORIES,MOCK_QUESTIONS, MOCK_TAGS } from "../utils/mock/mockData";
 import { BookOpen, Tags } from "lucide-react";
-import { BDU, BDU_DARK } from "../utils/css";
-import useTagsWithCount from "../helper/useTagsWithCount"
-import { getCategories } from "../api/questionService";
+import { BDU, BDU_DARK } from "../utils/css"; 
+import { getCategories, getTags } from "../api/questionService";
 import { getCategoryEmoji } from "../helper/categoryIcons";
+import LoadingPage from "./LoadingPage";
 
 const CategoryPage = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("categories"); 
   const [categories, setCategories] = useState([]);
-  const tags = useTagsWithCount();
+  const [tags, setTags] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  // const tags = useTagsWithCount();
 
   useEffect(()=> {
     const fetchCategories = async () =>{
@@ -23,6 +25,21 @@ const CategoryPage = () => {
       }
     }
     fetchCategories();
+  }, []);
+  useEffect(() => {
+      const fetchTags = async () => {
+        try{
+          setIsLoading(true);
+          const response = await getTags(); 
+          console.log("Fetched tags:", response);
+          setTags(response); 
+        }catch(error){
+          console.error("Failed to fetch tags:", error);
+        }finally{
+          setIsLoading(false);
+        }
+      }
+      fetchTags();
   }, []);
 
   return (
@@ -60,8 +77,10 @@ const CategoryPage = () => {
             Tags
           </button>
         </div> 
-      {/* ---------------- CATEGORIES VIEW ---------------- */}
-      {view === "categories" && (
+          
+      {isLoading ? (
+        <LoadingPage message="Loading categories..." isFullPage={false} />
+      ) : view === "categories" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories?.map((cat) => (
             <button
@@ -91,8 +110,10 @@ const CategoryPage = () => {
         </div>
       )}
 
-      {/* ---------------- TAGS VIEW ---------------- */}
-      {view === "tags" && (
+      
+      {isLoading ? (
+        <LoadingPage message="Loading tags..." isFullPage={false} />
+      ) : view === "tags" && (
         <div className="flex flex-wrap gap-3">
           {tags?.map((tag) => (
             <button

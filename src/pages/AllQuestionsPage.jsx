@@ -45,7 +45,7 @@ const AllQuestionsPage = () => {
         const catData = await getCategories(); 
         setCategories(catData);
 
-        const questionData = await getQuestions(); 
+        const questionData = await getQuestions();  
         setQuestions(questionData.results);
         
       } catch (error) {
@@ -83,7 +83,7 @@ if (searchText.trim()) {
     case "most-liked":
       return list.sort((a, b) => b.likes - a.likes);
     case "most-answered":
-      return list.sort((a, b) => b.answers - a.answers);
+      return list.sort((a, b) => b.answers_count - a.answers_count);
     case "newest":
     default:
       return list.sort((a, b) => new Date(b.date) - new Date(a.date));
