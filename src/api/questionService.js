@@ -78,6 +78,14 @@ export const updateQuestion = async (id, formData) => {
     throw error;
   }
 };
+
+export const deleteQuestion = async (id)=>{
+  try{
+    await apiPrivate.delete(`/questions/questions/${id}/`); 
+  }catch{
+    console.error("error during delating the questio with id: ", id);
+  }
+}
  
 
 export const postAnswer = async (data) => {

@@ -86,7 +86,7 @@ useEffect(() => {
           bookmarkCount={bookmarkCount}
         />}
 
-        <main className="pt-[76px] pb-10">
+        <main className="pt-[76px] pb-10 flex-1 min-w-0 lg:ml-64">
           {isFullScreenPage? (<Routes>
             <Route path="/notfound" element={<NotFoundPage />} />
             <Route path="/auth" element={ <AuthPage isRegister={isRegistering} setIsRegister={setIsRegistering}  /> } />

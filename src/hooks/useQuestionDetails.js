@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import apiPrivate from "../api/axiosPrivate"; // Import for direct toggle calls
+import apiPrivate from "../api/axiosPrivate"; 
 import { 
   getQuestionById, postAnswer, updateAnswer, 
-  deleteAnswerApi, postComment, getQuestions 
+  deleteAnswerApi, postComment, getQuestions, 
+  deleteQuestion
 } from "../api/questionService";
 
 export const useQuestionDetails = (id) => {
@@ -19,8 +20,11 @@ export const useQuestionDetails = (id) => {
       const data = await getQuestionById(id);
       setQuestion(data);
       setAnswers(data.answers || []);
+      
       const related = await getQuestions({ category: data.category });
-      setRelatedQuestions(related.results?.filter(q => q.id !== parseInt(id)).slice(0, 3) || []);
+      // Safety check for paginated related questions
+      const relatedList = related?.results || (Array.isArray(related) ? related : []);
+      setRelatedQuestions(relatedList.filter(q => q.id !== parseInt(id)).slice(0, 3));
     } catch (err) {
       console.error("Failed to load data", err);
     } finally {
@@ -30,21 +34,31 @@ export const useQuestionDetails = (id) => {
 
   useEffect(() => { if (id) loadData(); }, [id]);
 
-  // --- Like/Dislike Logic ---
-  const handleToggleLike = async (type, targetId) => {
+  const handleToggleLike = async (type, targetId, isLike) => {
     try {
-      const url = `/questions/${type}s/${targetId}/like-toggle/`;
-      const response = await apiPrivate.post(url);
+      const endpoint = type === "question" ? `/questions/questions/${targetId}/like-toggle/` : `/questions/answers/${targetId}/like-toggle/`;
+      const response = await apiPrivate.post(endpoint, { is_like: isLike });
       const { likes, dislikes } = response.data;
-
       if (type === "question") {
         setQuestion(prev => ({ ...prev, likes, dislikes }));
       } else {
         setAnswers(prev => prev.map(a => a.id === targetId ? { ...a, likes, dislikes } : a));
       }
-    } catch (err) {
-      console.error("Toggle failed", err);
-    }
+    } catch (err) { console.error("Like toggle failed", err); }
+  };
+
+  const handleToggleBookmark = async (questionId) => {
+    try {
+      await apiPrivate.post(`/questions/questions/${questionId}/bookmark/`);
+      setQuestion(prev => ({ ...prev, is_bookmarked: !prev.is_bookmarked }));
+    } catch (err) { console.error("Bookmark toggle failed", err); }
+  };
+
+  const handleDeleteQuestion = async (questionId) => {
+    try {
+      await deleteQuestion(questionId);
+      window.location.href = "/";
+    } catch (err) { console.error("Failed to delete", err); } 
   };
 
   const handlePostAnswer = async (text) => {
@@ -66,16 +80,33 @@ export const useQuestionDetails = (id) => {
   const handlePostComment = async (answerId) => {
     const text = (commentInputs[answerId] || "").trim();
     if (!text) return;
-    const resp = await postComment(answerId, { body: text });
-    setAnswers(prev => prev.map(a => 
-      a.id === answerId ? { ...a, comments: [...(a.comments || []), resp] } : a
-    ));
-    setCommentInputs(prev => ({ ...prev, [answerId]: "" }));
+    try {
+      const resp = await postComment(answerId, { body: text });
+      
+      setAnswers(prev => prev.map(a => {
+        if (a.id === answerId) {
+          // Logic to handle both paginated and non-paginated comments
+          const currentComments = a.comments?.results || (Array.isArray(a.comments) ? a.comments : []);
+          const updatedList = [...currentComments, resp];
+          
+          // Keep structure consistent: if it was paginated, stay paginated
+          const newCommentsValue = a.comments?.results 
+            ? { ...a.comments, results: updatedList } 
+            : updatedList;
+
+          return { ...a, comments: newCommentsValue };
+        }
+        return a;
+      }));
+      setCommentInputs(prev => ({ ...prev, [answerId]: "" }));
+    } catch (err) { console.error("Comment post failed", err); }
   };
 
   return {
-    question, answers, relatedQuestions, loading,
+    question, answers, setAnswers, // Added setAnswers here
+    relatedQuestions, loading,
     commentInputs, setCommentInputs, openCommentsFor, setOpenCommentsFor,
-    handlePostAnswer, handleUpdateAnswer, handleDeleteAnswer, handlePostComment, handleToggleLike
+    handlePostAnswer, handleUpdateAnswer, handleDeleteAnswer, handlePostComment,
+    handleToggleLike, handleToggleBookmark, handleDeleteQuestion
   };
 };

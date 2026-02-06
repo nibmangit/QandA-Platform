@@ -6,7 +6,7 @@ const Footer = () => {
   const {isLoggedIn} = useAuth();
   return (
     <footer
-      className="mt-12 py-10 border-t border-gray-200"
+      className="mt-12 py-10 border-t border-gray-200 min-w-0 lg:ml-64"
       style={{ backgroundColor: BDU.NAVY }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">

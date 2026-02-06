@@ -21,7 +21,7 @@ const AuthorDisplay = ({ email, date, label = "Answered" }) => {
         <span>
           {label} by{" "}
           <span className="font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
-            {user?.name || email.split('@')[0]}
+            {user?.name || email?.split('@')[0]}
           </span>
         </span>
         <span className="text-[10px] opacity-70">{new Date(date).toLocaleString()}</span>

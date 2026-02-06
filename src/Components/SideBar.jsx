@@ -22,7 +22,7 @@ const SideBar = ({ children, sidebarNavItems}) => {
     <div className="flex">
 
       {/* Desktop Sidebar */}
-     <aside className="hidden lg:block w-64 shrink-0 sticky top-[61px]">
+     <aside className="hidden lg:block w-64 shrink-0 fixed top-[61px] left-0 h-[calc(100vh-61px)] z-40">
         <div
           className={`
             p-4 pt-10 h-[calc(100vh-76px)] overflow-y-auto 
