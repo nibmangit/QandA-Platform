@@ -37,12 +37,13 @@ export const useQuestionDetails = (id) => {
   const handleToggleLike = async (type, targetId, isLike) => {
     try {
       const endpoint = type === "question" ? `/questions/questions/${targetId}/like-toggle/` : `/questions/answers/${targetId}/like-toggle/`;
-      const response = await apiPrivate.post(endpoint, { is_like: isLike });
-      const { likes, dislikes } = response.data;
+      const response = await apiPrivate.post(endpoint, { is_like: isLike }); 
       if (type === "question") {
-        setQuestion(prev => ({ ...prev, likes, dislikes }));
+        setQuestion(prev => ({ ...prev, ...response.data }));
       } else {
-        setAnswers(prev => prev.map(a => a.id === targetId ? { ...a, likes, dislikes } : a));
+        setAnswers(prev => prev.map(a => 
+          a.id === targetId ? { ...a, ...response.data } : a
+        ));
       }
     } catch (err) { console.error("Like toggle failed", err); }
   };

@@ -23,7 +23,7 @@ export const getCategoriesById = async (id) => {
 
 export const getQuestions = async (params = {}) => {
   try {
-    const response = await apiPublic.get("/questions/questions/", { params });
+    const response = await apiPrivate.get("/questions/questions/", { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching questions:", error);
@@ -33,7 +33,7 @@ export const getQuestions = async (params = {}) => {
 
 export const getQuestionById = async (id) => {
   try {
-    const response = await apiPublic.get(`/questions/questions/${id}/`);
+    const response = await apiPrivate.get(`/questions/questions/${id}/`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching question with id ${id}:`, error);

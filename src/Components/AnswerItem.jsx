@@ -114,11 +114,16 @@ const AnswerItem = ({
 
       {/* Answer Footer */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-t dark:border-gray-700 pt-4 gap-4">
-        <AuthorDisplay email={answer.author} date={answer.created_at} />
+        <AuthorDisplay email={answer.author} date={answer.created_at} size="sm" label="Answered" />
         <div className="flex space-x-1">
-          <ActionButton icon={ThumbsUp} label={answer.likes} onClick={() => onLikeToggle("answer", answer.id, true)} />
-          <ActionButton icon={ThumbsDown} label={answer.dislikes} onClick={() => onLikeToggle("answer", answer.id, false)} />
-          <ActionButton icon={MessageSquare} label={commentsList.length} onClick={onToggleComments} active={isOpen} />
+        <ActionButton icon={ThumbsUp} label={answer.likes} active={answer.is_liked} 
+          activeColor="text-blue-500" onClick={() => onLikeToggle("answer", answer.id, true)} />
+
+        <ActionButton icon={ThumbsDown} label={answer.dislikes} active={answer.is_disliked} 
+          activeColor="text-red-500" onClick={() => onLikeToggle("answer", answer.id, false)} />
+
+        <ActionButton icon={MessageSquare} label={commentsList.length} active={isOpen}
+          activeColor="text-blue-600" onClick={onToggleComments} />
         </div>
       </div>
 
@@ -132,7 +137,7 @@ const AnswerItem = ({
               return (
                 <div key={c.id} className="group border-b dark:border-gray-800 pb-2 last:border-0">
                   <div className="flex justify-between items-start">
-                    <span className="text-xs font-bold text-blue-500">{c.author}</span>
+                    <AuthorDisplay email={c.author} date={c.created_at} size="xs" label="Commented" />
                     <div className="flex items-center gap-2">
                         <span className="text-[10px] text-gray-400">{new Date(c.created_at).toLocaleTimeString()}</span>
                         {isCommentOwner && (

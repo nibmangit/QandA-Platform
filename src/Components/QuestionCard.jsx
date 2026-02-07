@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import DeleteModal from "./DeleteModal"; 
 import { getCategoriesById, getTags } from "../api/questionService";
 import AuthorDisplay from "./AuthorDisplay";
+import ActionButton from "../helper/ActionButton";
 
 const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = false, showFullBody = false }) => {
   const navigate = useNavigate();
@@ -49,14 +50,9 @@ const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = fals
           </div>
 
           <div className="flex space-x-2">
-            <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
-                    onClick={() => onBookmark()}>
-              <Bookmark 
-                size={18} 
-                fill={question.is_bookmarked ? "#FDB813" : "none"} 
-                className={question.is_bookmarked ? "text-yellow-500" : "text-gray-400"} 
-              />
-            </button>
+          <ActionButton icon={Bookmark} active={question.is_bookmarked} 
+            activeColor="text-yellow-500" onClick={() => onBookmark()} 
+            label={question.is_bookmarked ? "Saved" : "Save"} />
             {isOwner && (
               <>
                 <button onClick={() => navigate(`/edit-question/${question.id}`)} className="text-gray-400 hover:text-yellow-500 p-1"><Edit size={18} /></button>
@@ -85,14 +81,11 @@ const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = fals
 
         <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t dark:border-gray-800 gap-4">
           <div className="flex items-center space-x-4">
-            <button onClick={() => onLike("question", question.id, true)} className="flex items-center space-x-1 group">
-              <ThumbsUp size={18} className="text-gray-400 group-hover:text-green-500" />
-              <span className="text-sm dark:text-gray-400">{formatScore(question.likes)}</span>
-            </button>
-            <button onClick={() => onLike("question", question.id, false)} className="flex items-center space-x-1 group">
-              <ThumbsDown size={18} className="text-gray-400 group-hover:text-red-500" />
-              <span className="text-sm dark:text-gray-400">{formatScore(question.dislikes)}</span>
-            </button>
+            <ActionButton icon={ThumbsUp} label={formatScore(question.likes)} active={question.is_liked} 
+              activeColor="text-blue-500" onClick={() => onLike("question", question.id, true)} />
+
+            <ActionButton icon={ThumbsDown} label={formatScore(question.dislikes)} active={question.is_disliked} 
+              activeColor="text-red-500" onClick={() => onLike("question", question.id, false)} />
             <div className="flex items-center space-x-1">
               <MessageSquare size={18} className="text-blue-500" />
               <span className="text-sm font-bold dark:text-gray-400">{question.answers_count} Answers</span>
