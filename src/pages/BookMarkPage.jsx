@@ -1,36 +1,68 @@
+import { useEffect, useState } from "react";
+import { Bookmark, Search, BookOpen } from "lucide-react";
 import { BDU } from "../utils/css"; 
-import { MOCK_QUESTIONS } from "../utils/mock/mockData";
 import QuestionCard from "../Components/QuestionCard";
-import { Bookmark } from "lucide-react";
+import apiPrivate from "../api/axiosPrivate";
+import LoadingPage from "./LoadingPage";
+import { useQuestionActions } from "../hooks/useQuestionActions";
 
-function BookMarkPage(){
-const bookmarks = MOCK_QUESTIONS.filter(q => q.is_bookmarked);
+function BookMarkPage() {
+  const { questions, setQuestions, onLikeList, onBookmarkList, onDeleteList } = useQuestionActions();
+  const [loading, setLoading] = useState(true);
 
-    return(
-      <div className="max-w-7xl mx-auto py-10 px-4">
-      <h2 className="text-3xl font-bold mb-6 text-slate-800 dark:text-slate-100">
-        <Bookmark size={28} className="inline mr-2" /> Your Bookmarks
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        setLoading(true);
+        const res = await apiPrivate.get('/questions/bookmarks/');
+        console.log("Data: ", res.data) ;
+        // map it to get the raw question objects
+        const questionList = res.data.map(item => ({
+          ...item.question,
+          is_bookmarked: true 
+        }));
+        setQuestions(questionList);
+      } catch (err) {
+        console.error("Failed to fetch bookmarks", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBookmarks();
+  }, []);
+
+
+  if (loading) return <LoadingPage message="Loading your bookmarks..." isFullPage={false} />;
+
+  return (
+    <div className="max-w-7xl mx-auto py-10 px-4">
+      <h2 className="text-3xl font-bold mb-8 text-slate-800 dark:text-slate-100 flex items-center">
+        <Bookmark size={32} className="mr-3 text-yellow-500 fill-yellow-500" /> 
+        Your Bookmarks
       </h2>
-        <div className="max-w-4xl mx-auto">
-        {bookmarks.length === 0 ? (
+      
+      <div className="max-w-4xl">
+        {questions.length === 0 ? (
           <EmptyState />
         ) : (
           <div className="space-y-6">
-            {bookmarks.map(question => (
+            {questions.map(q => (
               <QuestionCard
-                key={question.id} 
-                question={question}
+                key={q.id} 
+                question={q}
+                onLike={(type, targetId, isLike) => onLikeList(type, targetId, isLike)}
+                onBookmark={() => onBookmarkList(q.id, true)}
+                onDelete={() => onDeleteList(q.id)}
               />
             ))}
           </div>
         )}
       </div>
-      </div>
-    )
+    </div>
+  );
 }
 
 export default BookMarkPage;
-
 
 
 const EmptyState = () => (

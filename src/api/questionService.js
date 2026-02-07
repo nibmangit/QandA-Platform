@@ -23,7 +23,9 @@ export const getCategoriesById = async (id) => {
 
 export const getQuestions = async (params = {}) => {
   try {
-    const response = await apiPrivate.get("/questions/questions/", { params });
+    const token = localStorage.getItem("accessToken");
+    const api = token ? apiPrivate : apiPublic;
+    const response = await api.get("/questions/questions/", { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching questions:", error);
@@ -85,25 +87,4 @@ export const deleteQuestion = async (id)=>{
   }catch{
     console.error("error during delating the questio with id: ", id);
   }
-}
- 
-
-export const postAnswer = async (data) => {
-  const response = await apiPrivate.post('/questions/answers/', data);
-  return response.data;
-};
-
-export const updateAnswer = async (id, data) => {
-  const response = await apiPrivate.patch(`/questions/answers/${id}/`, data);
-  return response.data;
-};
-
-export const deleteAnswerApi = async (id) => {
-  await apiPrivate.delete(`/questions/answers/${id}/`);
-};
-
-export const postComment = async (answerId, data) => {
-    // Matches path("answers/<int:answer_id>/comments/", ...)
-    const response = await apiPrivate.post(`/questions/answers/${answerId}/comments/`, data);
-    return response.data;
-};
+} 

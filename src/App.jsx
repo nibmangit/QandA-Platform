@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import {Home as HomeIcon, PlusSquare, BookOpen,HelpCircle, Zap, Shield, User,
-        List, Bell, Mail } from "lucide-react"; 
-
-import {MOCK_MESSAGES, MOCK_QUESTIONS } from "./utils/mock/mockData";
-import { BDU } from "./utils/css";
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { 
+  Home as HomeIcon, PlusSquare, BookOpen, HelpCircle, Zap, Shield, User,
+  List, Bell, Mail 
+} from "lucide-react"; 
+ 
+import { MOCK_MESSAGES, MOCK_QUESTIONS } from "./utils/mock/mockData";
+import { useAuth } from './context/AuthContext';
+import { getTitleForPath } from './helper/getTitleForPath';
+import {ProtectedRoute} from './helper/Protect';
+ 
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import SideBar from "./Components/SideBar";
+import AuthPage from "./pages/AuthPage"; 
+import LoadingPage from './pages/LoadingPage'; 
+ 
 import LandingPage from "./pages/LandingPage";
-import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import AskQuestionPage from "./pages/AskQuestionPage";
 import AllQuestionsPage from "./pages/AllQuestionsPage";
@@ -22,27 +29,23 @@ import CategoryPage from "./pages/CategoryPage";
 import InboxPage from "./pages/InboxPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AnnouncementDetailPage from './pages/AnnouncementDetailPage ';
-import { useAuth } from './context/AuthContext';
 import BookMarkPage from './pages/BookMarkPage';
 import HelpPage from './pages/HelpPage';
-import { getTitleForPath } from './helper/getTitleForPath';
-import LoadingPage from './pages/LoadingPage';
 
 const App = () => { 
   const location = useLocation();
-  const [isRegistering, setIsRegistering] = useState(false);
-  const {currentUser,isLoggedIn, isLoading} = useAuth()
-
-useEffect(() => {
-  const currentTitle = getTitleForPath(location.pathname);
+  const { currentUser, isLoggedIn, isLoading, isAuthOpen, closeAuth,  isRegisterMode, setIsRegisterMode } = useAuth();
+ 
+  useEffect(() => {
+    const currentTitle = getTitleForPath(location.pathname);
     document.title = currentTitle;
   }, [location.pathname]);
-
+ 
   const bookmarkCount = MOCK_QUESTIONS.filter(q => q.is_bookmarked && q.authorId === currentUser?.id).length;
   const unreadCount = MOCK_MESSAGES.filter(
     m => m.receiverId === currentUser?.id && !m.read
   ).length; 
-
+ 
   const sidebarNavItems = [
     { to: "/", label: "Home", icon: HomeIcon },
     { to: "/ask-question", label: "Ask Question", icon: PlusSquare, requiresAuth: true },
@@ -50,81 +53,82 @@ useEffect(() => {
     { to: "/categories", label: "Categories", icon: BookOpen },
     { to: "/reputation", label: "Reputation", icon: Zap }, 
     { to: "/inbox", label: "Inbox", icon: Mail, requiresAuth: true },
-    { to: currentUser ? `/profile/${currentUser.id}` : "/auth", label: "My Profile", icon: User, requiresAuth: true },
+    { to: currentUser ? `/profile/${currentUser.id}` : "/", label: "My Profile", icon: User, requiresAuth: true },
     { to: "/dashboard", label: "Dashboard", icon: Shield, requiresAuth: true },
     { to: "/notifications", label: "Notifications", icon: Bell, requiresAuth: true },
     { to: "/announcements", label: "Announcements", icon: Bell }, 
     { to: "/help", label: "Help", icon: HelpCircle }, 
-  ].filter(item => {
-    if (item.requiresAuth && !isLoggedIn) return false; 
-    return true;
-  });
-
-  const hiddenHeaderPaths = ["/auth", "/notfound"];
-  const hiddenFooterPaths = ["/auth", "/inbox", "/notfound"];
-  const showHeader = !hiddenHeaderPaths.includes(location.pathname);
-  const showFooter = !hiddenFooterPaths.includes(location.pathname);
-
-  const isFullScreenPage = location.pathname === "/notfound" || location.pathname === "/auth";
+  ].filter(item => !item.requiresAuth || isLoggedIn);
+ 
+  const isFullScreenPage = location.pathname === "/notfound";
+  const showHeader = !isFullScreenPage;
+  const showFooter = !isFullScreenPage && location.pathname !== "/inbox";
 
   if (isLoading) {
-        return ( <LoadingPage />);
-    }
+    return <LoadingPage />;
+  }
 
   return (  
-      <div
-      className={`bd-[${BDU.BG} transition-colors duration-300  min-h-screen font-[Inter,sans-serif] dark:bg-[#0D1B2A]`}
-      >
+    <div className="transition-colors duration-300 min-h-screen font-[Inter,sans-serif] dark:bg-[#0D1B2A]">
+      
+      <style>{`
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .font-roboto { font-family: 'Roboto', sans-serif; }
+      `}</style>
 
-        <style>{`
-          .font-poppins { font-family: 'Poppins', sans-serif; }
-          .font-roboto { font-family: 'Roboto', sans-serif; }
-        `}</style>
-
-       {showHeader && <Header 
+      {showHeader && (
+        <Header 
           unreadCount={unreadCount}
           bookmarkCount={bookmarkCount}
-        />}
+        />
+      )}
 
-        <main className="pt-[76px] pb-10 flex-1 min-w-0 lg:ml-64">
-          {isFullScreenPage? (<Routes>
+      <main className="pt-[76px] pb-10 flex-1 min-w-0 lg:ml-64">
+        {isFullScreenPage ? (
+          <Routes>
             <Route path="/notfound" element={<NotFoundPage />} />
-            <Route path="/auth" element={ <AuthPage isRegister={isRegistering} setIsRegister={setIsRegistering}  /> } />
-          </Routes>):
-            (<SideBar sidebarNavItems={sidebarNavItems}  >
+            <Route path="*" element={<Navigate to="/notfound" replace />} />
+          </Routes>
+        ) : (
+          <SideBar sidebarNavItems={sidebarNavItems}>
             <div className="flex-1 min-w-0 mt-6 lg:mt-0 px-4 lg:px-8">
-
               <Routes>  
+                {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/questions" element={<AllQuestionsPage />} />
                 <Route path="/categories" element={<CategoryPage />} />
                 <Route path="/reputation" element={<ReputationPage />} /> 
                 <Route path="/announcements" element={<AnnouncementsPage />} />
                 <Route path="/announcements/:announcementId" element={<AnnouncementDetailPage />} /> 
-                <Route path="help" element={<HelpPage />} />
+                <Route path="/help" element={<HelpPage />} /> 
 
-                <Route path="/auth" element={ <AuthPage isRegister={isRegistering} setIsRegister={setIsRegistering}  /> } />
- 
-                <Route path="/dashboard" element={isLoggedIn ? ( <Dashboard /> ) : ( <Navigate to="/auth" replace /> )} />
-                <Route path="/questions/:id" element={isLoggedIn ? ( <QuestionDetailsPage /> ) : ( <Navigate to="/auth" replace /> )} />
-                <Route  path="/ask-question"  element={isLoggedIn ? (<AskQuestionPage mode='ask' /> ) : (  <Navigate to="/auth" replace /> )}  />
-                <Route  path="/edit-question/:questionId"  element={isLoggedIn ? (  <AskQuestionPage mode='edit' /> ) : (<Navigate to="/auth" replace /> )} />
-                <Route  path="/profile/:userId"  element={isLoggedIn ? ( <UserProfilePage /> ) : ( <Navigate to="/auth" replace /> )} />
-                <Route path="/inbox" element={isLoggedIn ? ( <InboxPage /> ) : ( <Navigate to="/auth" replace /> )}  />
-                <Route  path="/notifications"  element={isLoggedIn ? ( <NotificationsPage /> ) : ( <Navigate to="/auth" replace />  )} />
-                <Route  path="/bookmarks"  element={isLoggedIn ? ( <BookMarkPage /> ) : ( <Navigate to="/auth" replace />  )} />
- 
+                {/* --- PROTECTED ROUTES (URL SECURED) --- */}
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/questions/:id" element={<ProtectedRoute><QuestionDetailsPage /></ProtectedRoute>} />
+                <Route path="/ask-question" element={<ProtectedRoute><AskQuestionPage mode='ask' /></ProtectedRoute>} />
+                <Route path="/edit-question/:questionId" element={<ProtectedRoute><AskQuestionPage mode='edit' /></ProtectedRoute>} />
+                <Route path="/profile/:userId" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
+                <Route path="/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
+                <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+                <Route path="/bookmarks" element={<ProtectedRoute><BookMarkPage /></ProtectedRoute>} />
+
+                {/* Catch-all redirect */}
                 <Route path="*" element={<Navigate to="/notfound" replace />} />
-
               </Routes>
-
             </div>
-          </SideBar>)}
-          
-        </main>
+          </SideBar>
+        )}
+ 
+        <AuthPage 
+          isOpen={isAuthOpen} 
+          onClose={closeAuth} 
+          isRegister={isRegisterMode} 
+          setIsRegister={setIsRegisterMode} 
+        />
+      </main>
 
-        {showFooter && <Footer />}
-      </div> 
+      {showFooter && <Footer />}
+    </div> 
   );
 };
 

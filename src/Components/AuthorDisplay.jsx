@@ -1,25 +1,21 @@
 import { useEffect, useState } from "react";
 import { findUserByEmail } from "../api/userServiece";
+import { useNavigate } from "react-router-dom";
 
-const AuthorDisplay = ({ 
-  email, 
-  date, 
-  label = "Answered", 
-  size = "sm"
-}) => {
+const AuthorDisplay = ({email, date, label = "Answered", size = "sm" }) => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (email) {
       findUserByEmail(email).then(setUser);
     }
   }, [email]);
-
+  
   const avatarUrl = user?.avatar 
     ? user.avatar 
     : `https://placehold.co/100x100/4f06e5/ffffff?text=${email?.charAt(0).toUpperCase()}`;
-
-  // 1. Define the scaling configuration
+ 
   const sizeConfig = {
     xs: {
       avatar: "h-5 w-5",
@@ -40,8 +36,7 @@ const AuthorDisplay = ({
       gap: "gap-3"
     }
   };
-
-  // 2. Select current config (fallback to md)
+ 
   const current = sizeConfig[size] || sizeConfig.md;
 
   return (
@@ -55,7 +50,7 @@ const AuthorDisplay = ({
       <div className="flex flex-col leading-tight">
         <span className={current.text}>
           {label && <span className="opacity-80">{label} by </span>}
-          <span className="font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
+          <span onClick={()=>navigate(`/profile/${user?.id}`)}className="font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">
             {user?.username || user?.name || email?.split('@')[0]}
           </span>
         </span>

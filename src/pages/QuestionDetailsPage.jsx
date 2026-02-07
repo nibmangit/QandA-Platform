@@ -30,8 +30,7 @@ const QuestionDetailsPage = () => {
     commentInputs, setCommentInputs, openCommentsFor, setOpenCommentsFor,
     handlePostAnswer, handleUpdateAnswer, handleDeleteAnswer, handlePostComment,
     handleToggleLike, handleToggleBookmark, handleDeleteQuestion
-  } = useQuestionDetails(id);  
-  console.log("Question", question)
+  } = useQuestionDetails(id);   
 
   const openDeleteQuestionModal = () => {
     setModalConfig({

@@ -13,12 +13,10 @@ const AnswerItem = ({
   const isOwner = currentUser?.email === answer.author;
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(answer.body);
-
-  // States for Comment CRUD
+ 
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState("");
-
-  // Modal State for Comments
+ 
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
 
@@ -26,8 +24,6 @@ const AnswerItem = ({
     await onUpdate(answer.id, editText);
     setIsEditing(false);
   };
-
-  // --- Comment CRUD Logic ---
 
   const handleUpdateComment = async (commentId) => {
     try {
@@ -148,7 +144,7 @@ const AnswerItem = ({
                                 >
                                     <Edit size={12} />
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => openCommentDeleteModal(c.id)} 
                                     className="text-gray-400 hover:text-red-500 cursor-pointer"
                                 >
@@ -167,8 +163,8 @@ const AnswerItem = ({
                             onChange={(e) => setEditCommentText(e.target.value)}
                             autoFocus
                           />
-                          <button onClick={() => handleUpdateComment(c.id)} className="text-green-500"><Check size={16}/></button>
-                          <button onClick={() => setEditingCommentId(null)} className="text-red-500"><X size={16}/></button>
+                          <button onClick={() => handleUpdateComment(c.id)} className="text-green-500 cursor-pointer"><Check size={16}/></button>
+                          <button onClick={() => setEditingCommentId(null)} className="text-red-500 cursor-pointer"><X size={16}/></button>
                       </div>
                   ) : (
                       <p className="text-sm dark:text-gray-300 mt-1">{c.body}</p>
@@ -199,8 +195,7 @@ const AnswerItem = ({
           </div>
         </div>
       )}
-
-      {/* Dynamic Modal for Comment Deletion */}
+ 
       <DeleteModal 
         isOpen={isCommentModalOpen}
         onClose={() => setIsCommentModalOpen(false)}

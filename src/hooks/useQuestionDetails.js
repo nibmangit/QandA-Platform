@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import apiPrivate from "../api/axiosPrivate"; 
-import { 
-  getQuestionById, postAnswer, updateAnswer, 
-  deleteAnswerApi, postComment, getQuestions, 
-  deleteQuestion
-} from "../api/questionService";
+import { getQuestionById, getQuestions, deleteQuestion } from "../api/questionService";
+import { deleteAnswerApi, postAnswer, postComment, updateAnswer } from "../api/answerAndCommentService";
 
 export const useQuestionDetails = (id) => {
   const [question, setQuestion] = useState(null);
@@ -89,8 +86,7 @@ export const useQuestionDetails = (id) => {
           // Logic to handle both paginated and non-paginated comments
           const currentComments = a.comments?.results || (Array.isArray(a.comments) ? a.comments : []);
           const updatedList = [...currentComments, resp];
-          
-          // Keep structure consistent: if it was paginated, stay paginated
+           
           const newCommentsValue = a.comments?.results 
             ? { ...a.comments, results: updatedList } 
             : updatedList;

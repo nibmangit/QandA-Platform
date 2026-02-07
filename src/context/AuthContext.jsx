@@ -9,6 +9,26 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
+
+  const openLogin = () => {
+    setError("");
+    setIsRegisterMode(false);
+    setIsAuthOpen(true);
+  };
+
+  const openRegister = () => {
+    setError("");
+    setIsRegisterMode(true);
+    setIsAuthOpen(true);
+  };
+
+  const closeAuth = () => {
+    setIsAuthOpen(false);
+    setError("");
+  };
+
   // ---------- LOAD USER FROM LOCAL STORAGE ----------
   useEffect(() => {
     async function loadUser() {
@@ -36,8 +56,7 @@ export const AuthProvider = ({ children }) => {
 
   // ---------- LOGIN ----------
   const login = async (email, password) => {
-    setError("");
-    setIsLoading(true);
+    setError(""); 
     try {
       const data = await loginUser(email, password); 
       if (!data.access || !data.refresh) {
@@ -51,31 +70,25 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("currentUser", JSON.stringify(user));
  
       setCurrentUser(user);
-      setIsLoggedIn(true);
-      setIsLoading(false);
+      setIsLoggedIn(true); 
  
       return true;
-    } catch (err) { 
-      setError(err.detail || "Login failed");
-      setIsLoading(false);
+    } catch {  
       return false;
     }
   };
 
   // ---------- REGISTER ----------
   const register = async ({ name, email, password }) => {
-    setError("");
-    setIsLoading(true);
+    setError(""); 
     try { 
       await registerUser({ name, email, password });
-
-      setIsLoading(false);
+ 
       console.log("Registration successful. Please log in.");
       return true;
     } catch (err) {
       console.error("Register error:", err);
-      setError(err.detail || "Registration failed");
-      setIsLoading(false);
+      setError(err.detail || "Registration failed"); 
       return false;
     }
   };
@@ -88,17 +101,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   };
-
-  // ---------- REFRESH PROFILE ----------
-  const refreshProfile = async () => {
-    try {
-      const user = await getProfile();
-      setCurrentUser(user);
-      localStorage.setItem("currentUser", JSON.stringify(user));
-    } catch (err) {
-      console.error("Failed to refresh profile:", err);
-    }
-  };
+ 
   const updateCurrentUser = (updatedUser) => {
   setCurrentUser(updatedUser);
   localStorage.setItem("currentUser", JSON.stringify(updatedUser));
@@ -116,8 +119,13 @@ export const AuthProvider = ({ children }) => {
         setError,
         login,
         register,
-        logout,
-        refreshProfile,
+        logout, 
+        isAuthOpen,
+        isRegisterMode,
+        setIsRegisterMode,
+        openLogin,
+        openRegister,
+        closeAuth,
       }}
     >
       {children}

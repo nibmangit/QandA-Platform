@@ -10,7 +10,7 @@ import ActionButton from "../helper/ActionButton";
 
 const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = false, showFullBody = false }) => {
   const navigate = useNavigate();
-  const { currentUser, isLoggedIn } = useAuth();
+  const { currentUser, isLoggedIn, openLogin } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [category, setCategory] = useState(null); 
   const [questionTags, setQuestionTags] = useState([]);
@@ -32,31 +32,34 @@ const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = fals
 
   const isOwner = isLoggedIn && currentUser?.email === question.author;
 
-  // const handleAction = (actionFn, ...args) => {
-  //   if (!isLoggedIn) return navigate("/auth");
-  //   if (actionFn) actionFn(...args);
-  // };
+  const protectedAction = (action) => {
+    if (!isLoggedIn) { 
+      openLogin();
+    } else {
+      action();
+    }
+  };
 
   return (
     <>
       <div className={`bg-white dark:bg-[#1A2A3A] p-5 rounded-xl shadow-md border border-gray-100 dark:border-[#1E293B] transition-shadow hover:shadow-lg`}>
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className={`text-lg font-bold cursor-pointer hover:text-blue-500 transition-colors dark:text-white`}
-                onClick={() => navigate(`/questions/${question.id}`)}>
+            <h3 className={`text-lg font-bold cursor-pointer hover:text-blue-500 transition-colors dark:text-white wrap-break-word`}
+                onClick={() => protectedAction(() => navigate(`/questions/${question.id}`))}>
               {question.title}
             </h3>
             <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1 uppercase">@ {category?.name || "General"}</p>
           </div>
-
-          <div className="flex space-x-2">
-          <ActionButton icon={Bookmark} active={question.is_bookmarked} 
-            activeColor="text-yellow-500" onClick={() => onBookmark()} 
-            label={question.is_bookmarked ? "Saved" : "Save"} />
+ 
+          <div className="hidden sm:flex space-x-2">
+            <ActionButton icon={Bookmark} active={question.is_bookmarked} 
+              activeColor="text-yellow-500" onClick={() => protectedAction(() => onBookmark())} 
+              label={question.is_bookmarked ? "Saved" : "Save"} />
             {isOwner && (
               <>
-                <button onClick={() => navigate(`/edit-question/${question.id}`)} className="text-gray-400 hover:text-yellow-500 p-1"><Edit size={18} /></button>
-                <button onClick={() => setIsModalOpen(true)} className="text-gray-400 hover:text-red-500 p-1"><Trash2 size={18} /></button>
+                <button onClick={() => navigate(`/edit-question/${question.id}`)} className="text-gray-400 hover:text-yellow-500 p-1 cursor-pointer"><Edit size={18} /></button>
+                <button onClick={() => setIsModalOpen(true)} className="text-gray-400 hover:text-red-500 p-1 cursor-pointer"><Trash2 size={18} /></button>
               </>
             )}
           </div>
@@ -80,15 +83,32 @@ const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = fals
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t dark:border-gray-800 gap-4">
-          <div className="flex items-center space-x-4">
-            <ActionButton icon={ThumbsUp} label={formatScore(question.likes)} active={question.is_liked} 
-              activeColor="text-blue-500" onClick={() => onLike("question", question.id, true)} />
+          <div className="flex items-center flex-wrap gap-3">
+            <div className="flex items-center space-x-4">
+              <ActionButton icon={ThumbsUp} label={formatScore(question.likes)} active={question.is_liked} 
+                activeColor="text-blue-500" onClick={() => protectedAction(() => onLike("question", question.id, true))} />
 
-            <ActionButton icon={ThumbsDown} label={formatScore(question.dislikes)} active={question.is_disliked} 
-              activeColor="text-red-500" onClick={() => onLike("question", question.id, false)} />
+              <ActionButton icon={ThumbsDown} label={formatScore(question.dislikes)} active={question.is_disliked} 
+                activeColor="text-red-500" onClick={() => protectedAction(() => onLike("question", question.id, false))} />
+            </div>
+
+            {/* --- MOBILE VIEW BUTTONS --- */}
+            {/* flex on mobile, hidden on small screens and up (640px+) */}
+            <div className="flex sm:hidden items-center space-x-2 border-l border-gray-200 dark:border-gray-700 pl-2">
+              <ActionButton icon={Bookmark} active={question.is_bookmarked} 
+                activeColor="text-yellow-500" onClick={() => protectedAction(() => onBookmark())} 
+                label={question.is_bookmarked ? "Saved" : "Save"} />
+              {isOwner && (
+                <>
+                  <button onClick={() => navigate(`/edit-question/${question.id}`)} className="text-gray-400 hover:text-yellow-500 p-1 cursor-pointer"><Edit size={18} /></button>
+                  <button onClick={() => setIsModalOpen(true)} className="text-gray-400 hover:text-red-500 p-1 cursor-pointer"><Trash2 size={18} /></button>
+                </>
+              )}
+            </div>
+
             <div className="flex items-center space-x-1">
               <MessageSquare size={18} className="text-blue-500" />
-              <span className="text-sm font-bold dark:text-gray-400">{question.answers_count} Answers</span>
+              <span className="text-sm font-bold dark:text-gray-400">{question.answers_count} <span className="hidden xs:inline">Answers</span></span>
             </div>
           </div>
           <AuthorDisplay email={question.author} date={question.created_at} label="Asked" />

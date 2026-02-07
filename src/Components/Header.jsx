@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { BDU } from "../utils/css.jsx";
 import Search from "./Search.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";  
 
 const Header = ({ unreadCount, BookmarkCount }) => {
-  const { currentUser, isLoggedIn } = useAuth();
+  const { currentUser, isLoggedIn, openLogin, openRegister } = useAuth();
   const navigate = useNavigate();
   const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme(); 
 
@@ -132,23 +132,24 @@ const Header = ({ unreadCount, BookmarkCount }) => {
               </div>
             </div>
           ) : (
-            <div className="space-x-2">
+            <div className="space-x-2"> 
               <button
-                onClick={() => navigate("/auth")}
-                className="px-4 py-2 text-sm font-semibold rounded-xl transition-all hover:bg-gray-100 text-[#003366] dark:text-[#F1F5F9] dark:hover:bg-[#003366] hover:cursor-pointer"
+                onClick={openLogin}
+                className="px-3 md:px-5 py-2 text-sm font-semibold rounded-xl text-[#003366] dark:text-[#F1F5F9] hover:bg-gray-100 dark:hover:bg-[#003366] transition cursor-pointer"
               >
                 Login
               </button>
-
+               
               <button
-                onClick={() => navigate("/auth")}
-                className={`px-4 py-2 text-sm font-semibold rounded-xl transition text-white shadow-md bg-[${BDU.ACCENT}] hover:bg-[#1E40AF] hover:cursor-pointer`}
+                onClick={openRegister}
+                className="px-3 md:px-5 py-2 text-sm font-bold rounded-xl text-white shadow-md hover:opacity-90 transition cursor-pointer"
+                style={{ backgroundColor: BDU.ACCENT }}
               >
-                Register
+                Sign Up
               </button>
             </div>
           )}
-        </div>
+        </div> 
       </div>
     </header>
   );

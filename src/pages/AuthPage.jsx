@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Loader2, X } from "lucide-react";
 import { BDU } from "../utils/css"; 
-import { useAuth } from "../context/AuthContext"; 
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";  
 
-const AuthPage = ({ isRegister, setIsRegister }) => {
-  const { login, register, error, setError } = useAuth();
-  const navigate = useNavigate();
-
+const AuthPage = ({ isOpen, onClose, isRegister, setIsRegister }) => {
+  const { login, register, error, setError } = useAuth(); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
+
+  if (!isOpen) return null;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,16 +19,21 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
       setError("Please fill out all input fields!");
       return;
     }
-    try{
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    try {
       setIsLoading(true);
-      const response = await login(email, password);
-      console.log("Login response:", response);
-      if(response){
-       navigate("/dashboard"); 
-      } 
+      const response = await login(email, password); 
+      if (response) {
+        onClose(); 
+      }else{
+        setError("Invalid email or password.");
+      }
     } catch {
       setError("Invalid email or password.");
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -41,38 +45,40 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
       setError("Please fill out all input fields!");
       return;
     }
-      if (!/^[A-Za-z\s]{2,}$/.test(name)) {
-    setError("Name must be at least 2 letters and contain only letters.");
-    return;
-  }
- 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    setError("Please enter a valid email address.");
-    return;
-  }
- 
-  if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password)) {
-    setError(
-      "Password must be at least 6 characters and include letters and numbers."
-    );
-    return;
-  }
-  try{
-    setIsLoading(true);
-    const response = await register({ name, email, password });
-     if(response) {setIsRegister(false)};
-  }catch {
-    setError("Registration failed. Email may already be in use.");  
-  }finally{
-    setIsLoading(false);
-  }
+    if (!/^[A-Za-z\s]{2,}$/.test(name)) {
+      setError("Name must be at least 2 letters and contain only letters.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password)) {
+      setError("Password must be at least 6 characters and include letters and numbers.");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const response = await register({ name, email, password });
+      if (response) setIsRegister(false);
+    } catch {
+      setError("Registration failed. Email may already be in use.");  
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return (
-    <div className="max-h-screen flex items-center justify-center p-1 bg-gray-100 dark:bg-[#0F172A] transition-colors">
-      <div className="flex flex-col mt-0 md:flex-row w-full max-w-5xl bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl overflow-hidden">
-        
-        
+  return ( 
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"> 
+      <div className="relative flex flex-col md:flex-row w-full max-w-5xl bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+         
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 dark:bg-black/10 dark:hover:bg-black/20 text-gray-500 dark:text-gray-300 hover:text-red-500 transition-colors"
+        >
+          <X size={24} />
+        </button>
+ 
         <div className="hidden md:flex w-1/2 items-center justify-center p-12"
               style={{ background: `linear-gradient(135deg, ${BDU.NAVY} 0%, #004488 100%)` }}>
             <div className="text-center text-white">
@@ -92,9 +98,8 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
               <div className="mt-6 w-24 h-2 bg-linear-to-r from-yellow-400 to-orange-500 mx-auto rounded-full animate-pulse"></div>
             </div>
         </div>
-
-        {/* RIGHT SIDE FORM */}
-        <div className="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center relative">
+ 
+        <div className="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center relative bg-white dark:bg-[#1E293B]">
           <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-gray-100">
             {isRegister ? "Create Account" : "Welcome Back"}
           </h2>
@@ -133,7 +138,7 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
               />
             </div>
 
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            {error && <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>}
 
             {!isRegister && (
               <div className="text-right text-sm">
@@ -145,10 +150,22 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
 
             <button
               type="submit"
-              className="w-full py-3 mt-4 text-white font-bold rounded-xl shadow-md hover:opacity-90 hover:scale-[1.02] transition transform"
-              style={{ backgroundColor: BDU.ACCENT }}
+              disabled={isLoading}
+              className="w-full py-3 mt-4 text-white font-bold rounded-xl shadow-md hover:opacity-90 hover:scale-[1.02] transition transform flex items-center justify-center gap-2"
+              style={{ 
+                backgroundColor: BDU.ACCENT,
+                opacity: isLoading ? 0.7 : 1,
+                cursor: isLoading ? "not-allowed" : "pointer"
+              }}
             >
-              {isLoading ? "Processing..." : isRegister ? "Register" : "Login"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                isRegister ? "Register" : "Login"
+              )}
             </button>
           </form>
 
@@ -160,7 +177,7 @@ const AuthPage = ({ isRegister, setIsRegister }) => {
                 setError("");
                 setIsRegister(!isRegister);
               }}
-              className="ml-1 font-semibold hover:underline text-blue-600 dark:text-blue-400"
+              className="ml-1 font-semibold hover:underline text-blue-600 dark:text-blue-400 cursor-pointer"
             >
               {isRegister ? "Login" : "Register"}
             </button>

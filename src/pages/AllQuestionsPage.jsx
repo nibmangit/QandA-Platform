@@ -1,15 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
-import { List, ChevronLeft, ChevronRight } from "lucide-react";  // Added Chevrons for pagination
+import { List, ChevronLeft, ChevronRight } from "lucide-react";
 import QuestionCard from "../Components/QuestionCard";
 import UserCard from "../Components/UserCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import Search from "../Components/Search";
 import { useQuestions } from "../context/QuestionContext";
 import { useTopUsers } from "../context/topUserContext";
-import { getCategories, getQuestions, deleteQuestion } from "../api/questionService";
-import apiPrivate from "../api/axiosPrivate";
+import { getCategories, getQuestions } from "../api/questionService";
 import { getCategoryEmoji } from "../helper/categoryIcons";
 import LoadingPage from "./LoadingPage"; 
+import { useQuestionActions } from "../hooks/useQuestionActions";
 
 const SortButton = ({ label, value, sortBy, setSortBy }) => (
   <a
@@ -24,25 +24,22 @@ const SortButton = ({ label, value, sortBy, setSortBy }) => (
 const AllQuestionsPage = () => {
   const navigate = useNavigate();
   const { topUsers } = useTopUsers();
-  const [sortBy, setSortBy] = useState('newest');
-  const [filterCategory, setFilterCategory] = useState(null); 
   const { searchText } = useQuestions();
   const location = useLocation();
+  const {questions, setQuestions, onLikeList, onBookmarkList, onDeleteList } = useQuestionActions();
+
+  const [sortBy, setSortBy] = useState('newest');
+  const [filterCategory, setFilterCategory] = useState(null); 
   const tagFilter = location.state?.filterTag || null;
   const categoryFilter = location.state?.filterCategory || null;
-  const [categories, setCategories] = useState([]);
-  const [questions, setQuestions] = useState([]);
+  const [categories, setCategories] = useState([]); 
   const [loading, setLoading] = useState(true);
-
-  // --- NEW: Pagination State ---
   const [nextUrl, setNextUrl] = useState(null);
   const [prevUrl, setPrevUrl] = useState(null);
- 
-  // Modified to accept an optional URL for pagination
+  
   const fetchAll = async (url = null) => {
     try {
-      setLoading(true);
-      // If url is passed (from pagination buttons), use it, otherwise use default
+      setLoading(true); 
       const [catData, questionData] = await Promise.all([
         getCategories(), 
         url ? getQuestions({ url }) : getQuestions()
@@ -61,40 +58,6 @@ const AllQuestionsPage = () => {
   useEffect(() => {
     fetchAll();
   }, []);
- 
-  const onLikeList = async (type, id, isLike) => {
-    try {
-      const resp = await apiPrivate.post(`/questions/questions/${id}/like-toggle/`, { 
-        is_like: isLike 
-      });
-       
-      setQuestions(prev => prev.map(q => 
-        q.id === id ? { ...q, likes: resp.data.likes, dislikes: resp.data.dislikes } : q
-      ));
-    } catch (err) {
-      console.error("Like failed:", err);
-    }
-  };
-
-  const onBookmarkList = async (id) => {
-    try {
-      await apiPrivate.post(`/questions/questions/${id}/bookmark/`);
-      setQuestions(prev => prev.map(q => 
-        q.id === id ? { ...q, is_bookmarked: !q.is_bookmarked } : q
-      ));
-    } catch (err) {
-      console.error("Bookmark failed:", err);
-    }
-  };
-
-  const onDeleteList = async (id) => {
-    try {
-      await deleteQuestion(id);
-      setQuestions(prev => prev.filter(q => q.id !== id));
-    } catch (err) {
-      console.error("Delete failed:", err);
-    }
-  };
 
   const filteredQuestions = useMemo(() => {
     let list = [...questions];
@@ -136,10 +99,9 @@ const AllQuestionsPage = () => {
                 {filteredQuestions.map(q => (
                   <QuestionCard 
                     key={q.id} 
-                    question={q} 
-                    // FIXED: Corrected arguments to match QuestionCard's call
+                    question={q}  
                     onLike={(type, targetId, isLike) => onLikeList(type, targetId, isLike)}
-                    onBookmark={() => onBookmarkList(q.id)}
+                    onBookmark={() => onBookmarkList(q.id, false)}
                     onDelete={() => onDeleteList(q.id)}
                   />
                 ))}
