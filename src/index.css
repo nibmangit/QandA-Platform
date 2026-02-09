@@ -6,3 +6,20 @@
    height: 100%;
    @apply transition-colors duration-300 ease-in-out;
  }
+
+
+ @layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 20px;
+  }
+  .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* slate-300 */
+  }
+  .dark .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #475569; /* slate-600 */
+  }
+}

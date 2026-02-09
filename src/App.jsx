@@ -4,8 +4,7 @@ import {
   Home as HomeIcon, PlusSquare, BookOpen, HelpCircle, Zap, Shield, User,
   List, Bell, Mail 
 } from "lucide-react"; 
- 
-import { MOCK_MESSAGES, MOCK_QUESTIONS } from "./utils/mock/mockData";
+  
 import { useAuth } from './context/AuthContext';
 import { getTitleForPath } from './helper/getTitleForPath';
 import {ProtectedRoute} from './helper/Protect';
@@ -39,12 +38,7 @@ const App = () => {
   useEffect(() => {
     const currentTitle = getTitleForPath(location.pathname);
     document.title = currentTitle;
-  }, [location.pathname]);
- 
-  const bookmarkCount = MOCK_QUESTIONS.filter(q => q.is_bookmarked && q.authorId === currentUser?.id).length;
-  const unreadCount = MOCK_MESSAGES.filter(
-    m => m.receiverId === currentUser?.id && !m.read
-  ).length; 
+  }, [location.pathname]); 
  
   const sidebarNavItems = [
     { to: "/", label: "Home", icon: HomeIcon },
@@ -77,11 +71,7 @@ const App = () => {
       `}</style>
 
       {showHeader && (
-        <Header 
-          unreadCount={unreadCount}
-          bookmarkCount={bookmarkCount}
-        />
-      )}
+        <Header /> )}
 
       <main className="pt-[76px] pb-10 flex-1 min-w-0 lg:ml-64">
         {isFullScreenPage ? (

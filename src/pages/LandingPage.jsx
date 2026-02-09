@@ -1,18 +1,37 @@
-import { CornerUpRight, TrendingUp, Clock, BookOpen } from "lucide-react"; 
+import { CornerUpRight, BookOpen, TrendingUp } from "lucide-react"; 
 import AnnouncementBanner from "../Components/AnnouncementBanner"; 
 import QuestionCard from "../Components/QuestionCard";
-import { BDU, BDU_DARK } from "../utils/css";
-import UserCard from "../Components/UserCard";
-import { MOCK_QUESTIONS, MOCK_USERS,MOCK_ANNOUNCEMENTS } from "../utils/mock/mockData";
-import { useNavigate } from "react-router-dom"; 
-import { useTopUsers } from "../context/topUserContext";
+import { BDU, BDU_DARK } from "../utils/css"; 
+import { MOCK_ANNOUNCEMENTS } from "../utils/mock/mockData";
+import { useNavigate } from "react-router-dom";  
+import TopContributors from "../Components/TopContributors";
+import { useQuestionActions } from "../hooks/useQuestionActions";
+import { useEffect, useState } from "react";
+import { getQuestions } from "../api/questionService";
+import LoadingPage from "./LoadingPage";
  
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const trendingQuestions = MOCK_QUESTIONS.sort((a, b) => b.likes - a.likes).slice(0, 4);
-  const {topUsers} = useTopUsers();
+  const { questions, setQuestions, onLikeList, onBookmarkList, onDeleteList } = useQuestionActions(); 
+  const [loading, setLoading] = useState(true);
   
+  useEffect(()=>{
+    const fetchTrending = async() =>{
+    try{
+      setLoading(true);
+      const data = await getQuestions();
+      const trending = data.results.sort((a,b)=>b.likes-a.likes).slice(0,4)
+      setQuestions(trending);
+    }catch{
+      console.error("Faild to fetch trending questions.")
+    }finally{
+      setLoading(false);
+    }
+  }
+  fetchTrending();
+  },[setQuestions])
+
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">   
     <div className="relative w-full overflow-hidden rounded-2xl shadow-xl mb-12">
@@ -67,36 +86,40 @@ const LandingPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> 
         <div className="lg:col-span-2 space-y-6">
-          <h3 className={`text-2xl font-bold color-[${BDU.TEXT}] dark:text-[${BDU_DARK.TEXT}]`}>Trending Questions</h3>
-          {trendingQuestions.map(q => <QuestionCard key={q.id} question={q} />)}
-          <div className="text-center pt-4">
-            <button
-              onClick={() => navigate('/questions')}
-              className={`text-sm font-semibold hover:underline hover:cursor-pointer transition-colors`}
-              style={{ color: BDU.ACCENT }}
-            >
-              View All Questions →
-            </button>
-          </div> 
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center">
+            <TrendingUp size={24} className="mr-2 text-orange-500" /> Trending Questions
+          </h3>
+
+          {loading ? (
+            <div className="space-y-4">
+               <LoadingPage message="Loading Trending Questions.." isFullPage={false} />
+            </div>
+          ) : (
+            <>
+              {questions.map(q => (
+                <QuestionCard 
+                    key={q.id} 
+                    question={q}  
+                    onLike={(type, targetId, isLike) => onLikeList(type, targetId, isLike)}
+                    onBookmark={() => onBookmarkList(q.id, false)}
+                    onDelete={() => onDeleteList(q.id)}
+                  />
+              ))}
+              
+              <div className="text-center pt-4">
+                <button
+                  onClick={() => navigate('/questions')}
+                  className="text-sm font-semibold hover:underline text-blue-600 dark:text-blue-400"
+                >
+                  View All Questions →
+                </button>
+              </div> 
+            </>
+          )}
         </div>
  
-        <div className="lg:col-span-1 space-y-8"> 
-          <div className={`bg-white dark:bg-[${BDU_DARK.BG}] p-6 rounded-2xl shadow-xl border border-gray-100`}>
-            <h4 className={`text-xl text-[${BDU.NAVY}] dark:text-[${BDU_DARK.TEXT}] font-bold mb-4 flex items-center`}>
-              <TrendingUp size={20} className="mr-2" /> Top Students
-            </h4>
-            <div className={`space-y-3  `}>
-              {topUsers?.map(user => <UserCard key={user.id} user={user}/>)}
-              <button
-                onClick={() => navigate('/reputation')}
-                className={`w-full text-sm hover:bg-gray-200 dark:hover:bg-[#4475c5]
-              bg-gray-100 dark:bg-[#1867e6] boarder-[${BDU.ACCENT}]  font-semibold mt-3 p-2 rounded-xl border border-dashed hover:cursor-pointer transition-colors`}
-                
-              >
-                View Leaderboard
-              </button>
-            </div>
-          </div> 
+        <div className="lg:col-span-1"> 
+          <TopContributors limit={5} />
         </div>
       </div>
     </div>

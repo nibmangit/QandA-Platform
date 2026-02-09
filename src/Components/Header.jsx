@@ -4,11 +4,16 @@ import { useTheme } from "../context/ThemeContext.jsx";
 import { BDU } from "../utils/css.jsx";
 import Search from "./Search.jsx";
 import { useAuth } from "../context/AuthContext.jsx";  
+import { useNotifications } from "../context/NotificationContext.jsx";
+import { useBookmarks } from "../context/BookmarkContext.jsx";
 
-const Header = ({ unreadCount, BookmarkCount }) => {
+const Header = () => {
+  const {unreadCount, notifications} = useNotifications();
+  const {bookmarkCount} = useBookmarks();
   const { currentUser, isLoggedIn, openLogin, openRegister } = useAuth();
   const navigate = useNavigate();
   const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme(); 
+  const messageCount = notifications.filter(n => !n.read && n.noti_type?.toLowerCase() === 'message').length;
 
   return (
     <header
@@ -68,57 +73,62 @@ const Header = ({ unreadCount, BookmarkCount }) => {
  
           {isLoggedIn ? (
             <div className="flex items-center space-x-2">
- 
+               
               <button
                 onClick={() => navigate("/notifications")}
-                className="relative p-2 rounded-full 
-                         hover:bg-gray-200 dark:hover:bg-[#374151]
-                        bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer"
+                className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151] bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer group"
                 title="Notifications"
               >
                 {unreadCount > 0 ? (
-                  <BellDot className="text-blue-600" size={22} />
+                  <>
+                    <BellDot className="text-blue-600 animate-pulse" size={22} />
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-[#1A2A3A]">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  </>
                 ) : (
-                  <Bell className="text-gray-500 dark:text-gray-300" size={22} />
-                )} 
-              </button>
-
-              <button
-                onClick={() => navigate("/bookmarks")}
-                className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151]
-              bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer"
-                title="Bookmarks"
-              >
-                <Bookmark size={24} className="text-[#1E293B] dark:text-[#F1F5F9]" />
-                 {BookmarkCount > 0 && (
-                  <span
-                    className="absolute text-green-500 top-0 right-0 block h-3 w-3 rounded-full ">
-                      9</span>
-                      )}
-              </button>
-
-              {/* Inbox */}
-              <button
-                onClick={() => navigate("/inbox")}
-                className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151]
-              bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer"
-                title="Inbox"
-              >
-                <Mail size={24} className="text-[#1E293B] dark:text-[#F1F5F9]" />
-                {unreadCount > 0 && (
-                  <span
-                    className="absolute top-0 right-0 block h-3 w-3 rounded-full ring-2 ring-white"
-                    style={{ backgroundColor: BDU.GOLD }}
-                  ></span>
+                  <Bell className="text-gray-500 dark:text-gray-300 group-hover:text-blue-500 transition-colors" size={22} />
                 )}
               </button>
 
-              {/* Profile */}
-              <div className="relative group">
+              {/* 2. Bookmarks */}
+              <button
+                onClick={() => navigate("/bookmarks")}
+                className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151] bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer group"
+                title="Bookmarks"
+              >
+                <Bookmark size={24} className="text-[#1E293B] dark:text-[#F1F5F9] group-hover:text-green-500 transition-colors" />
+                {bookmarkCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-[#1A2A3A]">
+                    {bookmarkCount > 9 ? "9+" : bookmarkCount}
+                  </span>
+                )}
+              </button>
+
+              {/* 3. Inbox (Specifically for Message Notifications) */}
+              <button
+                  onClick={() => navigate("/inbox")}
+                  className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151] bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer group"
+                  title="Inbox"
+                >
+                  <Mail size={24} className="text-[#1E293B] dark:text-[#F1F5F9] group-hover:text-amber-500 transition-colors" />
+                  
+                  {messageCount > 0 && (
+                    <span
+                      className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ring-2 ring-white dark:ring-[#1A2A3A]"
+                      style={{ backgroundColor: BDU.GOLD }}
+                    >
+                      {messageCount > 9 ? "9+" : messageCount}
+                    </span>
+                  )}
+                </button>
+
+              {/* 4. Profile Avatar */}
+              <div className="relative group pl-2">
                 <button
                   onClick={() => navigate(`/profile/${currentUser.id}`)}
-                  className="flex items-center space-x-2 p-1 rounded-full bg-gray-100 dark:bg-[#1E293B] hover:ring-2 hover:ring-[#2563EB] transition hover:cursor-pointer"
-                  title="profile"
+                  className="flex items-center space-x-2 p-0.5 rounded-full bg-gray-100 dark:bg-[#1E293B] hover:ring-2 hover:ring-[#2563EB] transition hover:cursor-pointer"
+                  title="Profile"
                 >
                   <img
                     src={
@@ -127,6 +137,7 @@ const Header = ({ unreadCount, BookmarkCount }) => {
                         : `https://placehold.co/100x100/4f06e5/ffffff?text=${currentUser.name?.charAt(0).toUpperCase()}`
                     }
                     className="h-8 w-8 rounded-full object-cover"
+                    alt="User avatar"
                   /> 
                 </button>
               </div>

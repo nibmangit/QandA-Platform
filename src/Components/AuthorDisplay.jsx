@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import { findUserByEmail } from "../api/userServiece";
 import { useNavigate } from "react-router-dom";
 
-const AuthorDisplay = ({email, date, label = "Answered", size = "sm" }) => {
-  const [user, setUser] = useState(null);
+const AuthorDisplay = ({email, date, label = "Answered", size = "sm", initialUser = null }) => {
+  const [user, setUser] = useState(initialUser);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (email) {
+    if (email && !user) {
       findUserByEmail(email).then(setUser);
     }
-  }, [email]);
+  }, [email, user]);
   
   const avatarUrl = user?.avatar 
     ? user.avatar 

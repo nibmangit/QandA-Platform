@@ -1,9 +1,11 @@
 import { useState } from "react";
 import apiPrivate from "../api/axiosPrivate";
 import { deleteQuestion } from "../api/questionService";
+import { useBookmarks } from "../context/BookmarkContext";
 
 export const useQuestionActions = (initialQuestions = []) => {
   const [questions, setQuestions] = useState(initialQuestions);
+  const {refreshBookmarks} = useBookmarks();
 
   const onLikeList = async (type, id, isLike) => {
     try {
@@ -30,6 +32,7 @@ export const useQuestionActions = (initialQuestions = []) => {
           q.id === id ? { ...q, is_bookmarked: !q.is_bookmarked } : q
         ));
       }
+      refreshBookmarks();
     } catch (err) {
       console.error("Bookmark failed:", err);
     }

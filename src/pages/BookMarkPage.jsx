@@ -29,7 +29,7 @@ function BookMarkPage() {
       }
     };
     fetchBookmarks();
-  }, []);
+  }, [setQuestions]);
 
 
   if (loading) return <LoadingPage message="Loading your bookmarks..." isFullPage={false} />;
@@ -74,7 +74,7 @@ const EmptyState = () => (
     <p className="text-gray-500 dark:text-gray-400 max-w-sm">
       It looks like your notebook is empty! Find interesting questions on the platform and tap the bookmark icon to save them here.
     </p>
-    <a href="#questions" className="flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:scale-[1.03] shadow-md bg-[#003366]">
+    <a href="/questions" className="flex items-center justify-center px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 hover:scale-[1.03] shadow-md bg-[#003366]">
       <Search size={18} className="mr-2" />
       Explore Questions
     </a>

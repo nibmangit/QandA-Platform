@@ -1,13 +1,9 @@
-import { MOCK_BADGES, MOCK_USERS } from "../utils/mock/mockData";
-import { Zap } from "lucide-react";
-import { formatScore } from "../utils/Find";
-import { useNavigate } from "react-router-dom";
-import BadgeDisplay from "../Components/BadgeDisplay";
-import { useTopUsers } from "../context/topUserContext";
+import { MOCK_BADGES } from "../utils/mock/mockData";
+import { Zap } from "lucide-react"; 
+import BadgeDisplay from "../Components/BadgeDisplay"; 
+import TopContributors from "../Components/TopContributors";
   
-const ReputationPage = () => {
-  const navigate = useNavigate();
-  const {topUsers} = useTopUsers();
+const ReputationPage = () => { 
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
@@ -23,50 +19,7 @@ const ReputationPage = () => {
           </h3>
 
           <div className="space-y-3">
-            {topUsers?.map((user, index) => (
-              <div
-                key={user.id}
-                className={`flex items-center p-3 rounded-xl ${
-                  index < 3
-                    ? "bg-yellow-50 dark:bg-yellow-900/20 shadow-sm"
-                    : "hover:bg-gray-50 dark:hover:bg-slate-800"
-                }`}
-              >
-                <span
-                  className={`text-xl font-extrabold mr-3 ${
-                    index === 0
-                      ? "text-yellow-600"
-                      : index === 1
-                      ? "text-gray-500"
-                      : index === 2
-                      ? "text-amber-700"
-                      : "text-gray-400 dark:text-slate-500"
-                  }`}
-                >
-                  #{index + 1}
-                </span>
-
-                <img
-                  src={user.avatar? user.avatar
-                    : `https://placehold.co/100x100/4f06e5/ffffff?text=${user.name?.charAt(0).toUpperCase()}`
-                  }
-                  alt={user.name}
-                  className="h-8 w-8 rounded-full object-cover mr-3"
-                />
-
-                <div className="flex-1">
-                  <p 
-                  onClick={()=>{navigate(`/profile/${user.id}`)}}
-                  className="font-semibold text-slate-700 dark:text-slate-200 hover:cursor-pointer">
-                    {user.name}
-                  </p>
-                </div>
-
-                <p className="font-bold text-blue-600 dark:text-blue-400">
-                  {formatScore(user.points)}
-                </p>
-              </div>
-            ))}
+             <TopContributors limit={10} showButton={false} />
           </div>
         </div>
 

@@ -27,7 +27,7 @@ const SideBar = ({ children, sidebarNavItems}) => {
           className={`
             p-4 pt-10 h-[calc(100vh-76px)] overflow-y-auto 
             bg-white border-r border-gray-200
-            dark:bg-[${DARK.BG_SECONDARY}] dark:border-gray-700
+            dark:bg-[#1E293B] dark:border-gray-700
           `}
         >
         <div className="space-y-2">
