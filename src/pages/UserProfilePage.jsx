@@ -33,7 +33,7 @@ const UserProfilePage = () => {
  
 useEffect(() => {
     const fetchProfileUser = async () => {
-      if (!currentUser) return; // wait until currentUser is loaded
+      if (!currentUser) return; 
 
       const isCurrent = userId === currentUser.id;
       try {

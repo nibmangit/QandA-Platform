@@ -7,15 +7,14 @@ import DeleteModal from "./DeleteModal";
 import { getCategoriesById, getTags } from "../api/questionService";
 import AuthorDisplay from "./AuthorDisplay";
 import ActionButton from "../helper/ActionButton";
+import ImageZoom from "./ImageZoom";
 
 const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = false, showFullBody = false }) => {
   const navigate = useNavigate();
   const { currentUser, isLoggedIn, openLogin } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [category, setCategory] = useState(null); 
-  const [questionTags, setQuestionTags] = useState([]);
-
-  const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+  const [questionTags, setQuestionTags] = useState([]); 
 
   useEffect(() => {
     const fetchMeta = async () => {
@@ -70,10 +69,7 @@ const QuestionCard = ({ question, onDelete, onLike, onBookmark, showImage = fals
         </p>
 
         {showImage && question.image && (
-          <div className="mt-4 mb-4 rounded-xl overflow-hidden border dark:border-gray-700">
-            <img src={question.image.startsWith('http') ? question.image : `${BASE_URL}${question.image}`} 
-                 alt="Content" className="w-full max-h-80 object-contain bg-gray-50 dark:bg-gray-900" />
-          </div>
+          <ImageZoom src={question.image} alt={question.title} className="w-full h-64 md:h-96" />
         )}
 
         <div className="flex flex-wrap gap-2 my-4">

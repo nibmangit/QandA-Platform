@@ -93,7 +93,7 @@ const NotificationsPage = () => {
             <button 
               key={t}
               onClick={() => setFilter(t)}
-              className={`px-6 py-2 rounded-lg text-sm font-bold capitalize transition-all ${filter === t ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' : 'text-gray-500'}`}
+              className={`px-6 py-2 rounded-lg text-sm font-bold capitalize transition-all cursor-pointer ${filter === t ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' : 'text-gray-500'}`}
             >
               {t}
             </button>
@@ -148,7 +148,7 @@ const NotificationsPage = () => {
                     {!n.read ? (
                       <button 
                         onClick={() => handleMarkAsRead(n.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg hover:scale-105 transition-transform"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg hover:scale-105 transition-transform cursor-pointer"
                       >
                         <Check size={16} />
                         <span className="hidden md:inline text-xs font-black uppercase">Mark Read</span>
@@ -162,7 +162,7 @@ const NotificationsPage = () => {
 
                     <button 
                       onClick={() => setModalConfig({ isOpen: true, type: 'one', targetId: n.id })}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all cursor-pointer"
                     >
                       <Trash2 size={20} />
                     </button>
