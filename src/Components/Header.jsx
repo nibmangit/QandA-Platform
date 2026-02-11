@@ -10,7 +10,7 @@ import { useBookmarks } from "../context/BookmarkContext.jsx";
 const Header = () => {
   const {unreadCount, notifications} = useNotifications();
   const {bookmarkCount} = useBookmarks();
-  const { currentUser, isLoggedIn, openLogin, openRegister } = useAuth();
+  const { currentUser, isLoggedIn, openLogin, openRegister } = useAuth(); 
   const navigate = useNavigate();
   const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme(); 
   const messageCount = notifications.filter(n => !n.read && n.noti_type?.toLowerCase() === 'message').length;

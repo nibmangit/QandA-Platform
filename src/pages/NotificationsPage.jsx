@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ThumbsUp, ThumbsDown, Bell, Mail, MessageSquare, MessageCircle, Megaphone, Award, Trash2, Check, CheckCheck, Inbox, RefreshCcw } from "lucide-react"; 
+import { Bell, Trash2, Check, CheckCheck, Inbox, RefreshCcw } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../context/NotificationContext";
+import { getNotificationConfig, formatNotiDate } from "../helper/notificationHelper";
 import LoadingPage from "./LoadingPage";
 import DeleteModal from "../Components/DeleteModal";
 import { useAuth } from "../context/AuthContext";
@@ -24,20 +25,7 @@ const NotificationsPage = () => {
   setLoadingMore(true);
   await loadMore();
   setLoadingMore(false);
-};
-  const getNotiConfig = (type) => {
-    type = type ? type.toLowerCase() : 'default'
-    switch (type) {
-      case 'like': return { Icon: ThumbsUp, color: 'text-yellow-500', border: 'border-yellow-500' };
-      case 'dislike': return { Icon: ThumbsDown, color: 'text-blue-600', border: 'border-blue-600' };
-      case 'comment': return { Icon: MessageCircle, color: 'text-purple-500', border: 'border-purple-500' };
-      case 'message': return { Icon: Mail, color: 'text-teal-500', border: 'border-teal-500' };
-      case 'announcement': return { Icon: Megaphone, color: 'text-orange-500', border: 'border-orange-500' };
-      case 'badge': return { Icon: Award, color: 'text-yellow-500', border: 'border-yellow-500' };
-      case 'answer': return { Icon: MessageSquare, color: 'text-green-500', border: 'border-green-500' };
-      default: return { Icon: Bell, color: 'text-gray-400', border: 'border-gray-400' };
-    }
-  };
+}; 
 
   const handleConfirmDelete = () => {
     if (modalConfig.type === 'all') {
@@ -124,7 +112,7 @@ const NotificationsPage = () => {
         {displayNotifications.length > 0 ? (
           <> 
             {displayNotifications.map((n) => {
-              const { Icon, color, border } = getNotiConfig(n.noti_type);
+              const { Icon, color, border } = getNotificationConfig(n.noti_type);
               return (
                 <div 
                   key={n.id} 
@@ -138,7 +126,7 @@ const NotificationsPage = () => {
                         {n.message}
                       </p>
                       <p className="text-[10px] text-gray-400 mt-1 uppercase font-semibold">
-                        {new Date(n.created_at).toLocaleDateString()} • {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatNotiDate(n.created_at)}
                       </p>
                     </div>
                   </div>

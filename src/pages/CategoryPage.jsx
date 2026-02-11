@@ -21,7 +21,7 @@ const CategoryPage = () => {
           getTags()
         ]);
         setCategories(catData);
-        setTags(tagData);
+        setTags(tagData.filter((tag)=>tag.count>0));
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {

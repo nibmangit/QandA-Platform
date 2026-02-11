@@ -1,13 +1,13 @@
 import { CornerUpRight, BookOpen, TrendingUp } from "lucide-react"; 
 import AnnouncementBanner from "../Components/AnnouncementBanner"; 
 import QuestionCard from "../Components/QuestionCard";
-import { BDU, BDU_DARK } from "../utils/css"; 
-import { MOCK_ANNOUNCEMENTS } from "../utils/mock/mockData";
+import { BDU, BDU_DARK } from "../utils/css";  
 import { useNavigate } from "react-router-dom";  
 import TopContributors from "../Components/TopContributors";
 import { useQuestionActions } from "../hooks/useQuestionActions";
 import { useEffect, useState } from "react";
 import { getQuestions } from "../api/questionService";
+import {getAnnouncements} from "../api/announcementService"
 import LoadingPage from "./LoadingPage";
  
 
@@ -15,6 +15,22 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { questions, setQuestions, onLikeList, onBookmarkList, onDeleteList } = useQuestionActions(); 
   const [loading, setLoading] = useState(true);
+  const [latestNews, setLatestNews] = useState([]);
+
+  useEffect(() => {
+    const fetchAnnouncement = async()=>{
+      try{
+        setLoading(true)
+        const data = await getAnnouncements()
+        setLatestNews(data.results.slice(0,3) || data.slice(0,3))
+      }catch{
+        console.error("Faild to fetch the announcement.")
+      }finally{
+        setLoading(false)
+      }
+    }
+    fetchAnnouncement();
+  },[])
   
   useEffect(()=>{
     const fetchTrending = async() =>{
@@ -79,9 +95,34 @@ const LandingPage = () => {
     </div>
     </div>
 
-      <div className="mb-12">
+      <div className="mb-12 space-y-4">
         <h3 className={`text-2xl font-bold mb-4 text-[${BDU.TEXT}] dark:text-[${BDU_DARK.TEXT}]`} >University Announcements</h3>
-        <AnnouncementBanner announcement={MOCK_ANNOUNCEMENTS[0]} />
+        {latestNews.map((ann, index ) => (
+          <div
+                key={ann.id}
+                className={`p-5 rounded-xl shadow-sm border-l-4 transition-all hover:translate-x-1 cursor-pointer
+                  ${index === 0? "border-yellow-500 bg-yellow-50/30 dark:bg-yellow-900/10" : "border-blue-500 bg-gray-50 dark:bg-[#0F172A]"}
+                  `}
+                onClick={() => navigate(`/announcements/${ann.id}`)}
+              >
+                <div className="flex justify-between items-start">
+                  <h3 className="text-lg font-bold text-[#1E293B] dark:text-white">
+                    {ann.title}
+                  </h3>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {new Date(ann.date).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <p className="text-sm mt-2 text-gray-700 dark:text-gray-300 line-clamp-2">
+                  {ann.body}
+                </p>
+
+                <div className="mt-3 text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center">
+                  Read Full Notice <span className="ml-1">→</span>
+                </div>
+              </div>
+        ))}        
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> 
