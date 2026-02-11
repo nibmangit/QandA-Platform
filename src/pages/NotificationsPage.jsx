@@ -6,6 +6,7 @@ import { getNotificationConfig, formatNotiDate } from "../helper/notificationHel
 import LoadingPage from "./LoadingPage";
 import DeleteModal from "../Components/DeleteModal";
 import { useAuth } from "../context/AuthContext";
+import EmptyState from "../Components/EmptyState";
 
 const NotificationsPage = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const NotificationsPage = () => {
           handleDeleteOne, handleDeleteAll, refresh, unreadCount,
           loadMore, nextPageUrl} = useNotifications();
 
-  const [filter, setFilter] = useState('unread');
+  const [filter, setFilter] = useState('all');
   const [loadingMore, setLoadingMore] = useState(false);
   
   // State for the Delete Modal
@@ -177,10 +178,17 @@ const NotificationsPage = () => {
             )}
           </>
         ) : ( 
-          <div className="text-center py-20 bg-gray-50 dark:bg-gray-800/20 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-            <Inbox size={48} className="mx-auto text-gray-300 mb-4 opacity-30" />
-            <p className="text-gray-500 font-medium">No {filter === 'unread' ? 'unread ' : ''}notifications found.</p>
-          </div>
+          <EmptyState
+              icon={filter === 'unread' ? CheckCheck : Inbox}
+              title={filter === 'unread' ? "You're All Caught Up!" : "Inbox is Empty"}
+              message={
+                filter === 'unread' 
+                  ? "You have no unread notifications. Check the 'All' tab to see your history." 
+                  : "It looks like you don't have any notifications yet. Start a discussion or help someone with an answer!"
+              }
+              buttonLabel="Back to Dashboard"
+              buttonLink="/dashboard"
+            />
         )}
       </div>
 

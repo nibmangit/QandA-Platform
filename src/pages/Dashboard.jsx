@@ -14,6 +14,7 @@ import LoadingPage from "./LoadingPage";
 import apiPrivate from "../api/axiosPrivate";
 import { useQuestionActions } from "../hooks/useQuestionActions";
 import { getAnnouncements } from "../api/announcementService";
+import EmptyState from "../Components/EmptyState";
 
 const Dashboard = () => {
   const {currentUser} = useAuth();
@@ -25,10 +26,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchMyQuestions = async () => {
       try {
-        setLoading(true);
-        console.log("Fetching questions for user:", currentUser.email);
+        setLoading(true); 
          const response = await apiPrivate.get(`/questions/questions/?author=${currentUser.email}`);
-         console.log("Received questions data:", response.data);
         const data = response.data.results || response.data;
         setQuestions(data.slice(0, 3));
       } catch (err) {
@@ -93,7 +92,8 @@ const Dashboard = () => {
               </button>
             </h3>
             <div className="space-y-3">
-            {notifications?.filter(n => !n.is_read).slice(0, 3).map((n) => {
+            {notifications?.filter(n => !n.is_read).length > 0 ? (
+            notifications?.filter(n => !n.is_read).slice(0, 3).map((n) => {
               const { Icon, color, bg } = getNotificationConfig(n.noti_type);
 
               return (
@@ -117,14 +117,22 @@ const Dashboard = () => {
                   </div>
                 </div>
               );
-            })}
+            })):(
+              <EmptyState
+                title="All Caught Up!" 
+                message="You have no unread notifications at the moment."
+                showButton={false}
+                icon={Zap} 
+              />
+            )}
           </div>
           </div>
  
           <div className="p-6 rounded-2xl shadow-xl border transition-colors border-gray-100 dark:border-gray-700 bg-white dark:bg-[#0F172A]">
             <h3 className="text-xl font-bold mb-4 dark:text-gray-100 text-gray-900">My Recent Questions</h3>
             <div className="space-y-4">
-              {questions?.map(q => 
+              {questions && questions.length > 0 ? (
+              questions?.map(q => 
               <QuestionCard 
                       key={q.id} 
                       question={q}  
@@ -132,6 +140,13 @@ const Dashboard = () => {
                       onBookmark={() => onBookmarkList(q.id, false)}
                       onDelete={() => onDeleteList(q.id)}
                     />
+              )):(
+                <EmptyState
+                    title="No Questions Yet" 
+                    message="Your recent activity is empty. Why not start a discussion?"
+                    buttonLabel="Ask a Question"
+                    buttonLink="/ask-question"
+                  />
               )}
             </div>
           </div>

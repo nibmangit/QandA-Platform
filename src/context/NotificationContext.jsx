@@ -103,8 +103,7 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const handleDeleteAll = async () => {
-    if (notifications.length === 0) return;
-    if (!window.confirm("Are you sure you want to clear all notifications?")) return;
+    if (notifications.length === 0) return; 
 
     try {
       setNotifications([]);

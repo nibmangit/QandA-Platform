@@ -1,4 +1,4 @@
-import { Zap } from "lucide-react"; 
+import { Award, Zap } from "lucide-react"; 
 import BadgeDisplay from "../Components/BadgeDisplay"; 
 import TopContributors from "../Components/TopContributors";
 import { useEffect, useState } from "react";
@@ -48,8 +48,9 @@ const ReputationPage = () => {
           <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
             Platform Badges
           </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          { badges && badges.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {badges?.map((badge, i) => (
               <BadgeDisplay
                 key={i}
@@ -58,7 +59,16 @@ const ReputationPage = () => {
                 description={badge.description}
               />
             ))} 
-          </div>
+          </div>):(
+            <EmptyState 
+              icon={Award}
+              title="No Badges Defined"
+              message="The rewards system is currently being updated. Check back soon to see how you can earn reputation points!"
+              buttonLabel="View My Profile"
+              buttonLink="/profile"
+            />
+          )}
+
         </div>
       </div>)}
     </div>

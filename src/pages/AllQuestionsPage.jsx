@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { List, ChevronLeft, ChevronRight, Menu, X, Layers } from "lucide-react";
+import { List, ChevronLeft, ChevronRight, Menu, X, Layers, BookOpen } from "lucide-react";
 import QuestionCard from "../Components/QuestionCard"; 
 import { useLocation, useNavigate } from "react-router-dom";
 import Search from "../Components/Search";
@@ -9,6 +9,7 @@ import { getCategoryEmoji } from "../helper/categoryIcons";
 import LoadingPage from "./LoadingPage"; 
 import { useQuestionActions } from "../hooks/useQuestionActions";
 import TopContributors from "../Components/TopContributors";
+import EmptyState from "../Components/EmptyState";
 
 const SortButton = ({ label, value, sortBy, setSortBy }) => (
   <button
@@ -195,10 +196,13 @@ const SidebarContent = () => (
                 </div>
               </>
             ) : (
-              <div className="text-center p-10 bg-white dark:bg-[#1A2A3A] rounded-2xl shadow-md border border-gray-100 dark:border-gray-800">
-                <p className="text-lg font-medium dark:text-gray-300">No questions found.</p>
-                <button onClick={() => navigate('/ask-question')} className="mt-4 px-6 py-2 text-white bg-blue-600 rounded-xl shadow-lg hover:bg-blue-700">Ask Now</button>
-              </div>
+              <EmptyState 
+              icon={BookOpen}
+              title="No Questions Found" 
+              message="It looks like no one has asked anything here yet. Be the first to start the conversation!" 
+              buttonLabel="Ask Now" 
+              buttonLink="/ask-question" 
+            />
             )}
           </div>
  

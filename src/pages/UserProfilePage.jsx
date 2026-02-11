@@ -9,6 +9,7 @@ import ProfileEditModal from "../Components/ProfileEditModal";
 import LoadingPage from "./LoadingPage";
 import { getProfile } from "../api/authService";
 import { getAllBadges } from "../api/badgeService";
+import EmptyState from "../Components/EmptyState";
 
 const UserProfilePage = () => {
   const { currentUser, isLoading: authLoading } = useAuth();
@@ -171,7 +172,16 @@ const UserProfilePage = () => {
                 </Link>
               ))
             ) : (
-              <div className="p-10 text-center bg-gray-50 dark:bg-[#1E293B]/20 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800 text-gray-400 italic">No questions yet.</div>
+              <EmptyState
+                icon={BookOpen}
+                title="No Questions Yet"
+                message={isOwnProfile 
+                  ? "You haven't asked any questions yet. Have something on your mind?" 
+                  : `${profileUser.name} hasn't posted any questions yet.`}
+                buttonLabel="Ask a Question"
+                buttonLink="/ask-question"
+                showButton={isOwnProfile} 
+              />
             )}
           </div>
         </div>
@@ -205,7 +215,16 @@ const UserProfilePage = () => {
                 </div>
               ))
             ) : (
-              <div className="p-10 text-center bg-gray-50 dark:bg-[#1E293B]/20 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800 text-gray-400 italic">No answers yet.</div>
+              <EmptyState 
+                icon={MessageSquare}
+                title="No Answers Yet"
+                message={isOwnProfile 
+                  ? "You haven't helped anyone yet! Browse questions to start earning reputation." 
+                  : `${profileUser.name} hasn't contributed any answers yet.`}
+                buttonLabel="Browse Questions"
+                buttonLink="/questions"
+                showButton={isOwnProfile}
+              />
             )}
           </div>
         </div>
@@ -216,9 +235,9 @@ const UserProfilePage = () => {
       )}
     </div>
   );
-};
+}; 
 
-// Reusable Stat Card Component
+
 const StatCard = ({ icon, label, value, color }) => (
   <div className="bg-white dark:bg-[#0F172A] p-6 rounded-3xl border border-gray-100 dark:border-gray-800 flex items-center space-x-4 shadow-sm hover:shadow-md transition-shadow">
     <div className={`p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/50 ${color}`}>{icon}</div>

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Tags as TagsIcon } from "lucide-react"; 
+import { BookOpen, LayoutGrid, Tag, Tags as TagsIcon } from "lucide-react"; 
 import { getCategories, getTags } from "../api/questionService";
 import { getCategoryEmoji } from "../helper/categoryIcons";
 import LoadingPage from "./LoadingPage";
+import EmptyState from "../Components/EmptyState";
 
 const CategoryPage = () => {
   const navigate = useNavigate();
@@ -92,7 +93,13 @@ const CategoryPage = () => {
                   </button>
                 ))
               ) : (
-                <p className="col-span-full text-center text-gray-500 py-10">No categories found.</p>
+                <EmptyState 
+                  icon={LayoutGrid}
+                  title="No Categories Found" 
+                  message="We couldn't find any categories at the moment. Please check back later or explore all questions directly." 
+                  buttonLabel="Explore All Questions"
+                  buttonLink="/questions" 
+                />
               )}
             </div>
           )}
@@ -113,7 +120,13 @@ const CategoryPage = () => {
                     </button>
                   ))
                 ) : (
-                  <p className="text-center w-full text-gray-500">No tags found.</p>
+                 <EmptyState
+                    icon={Tag}
+                    title="No Tags Available" 
+                    message="It looks like there are no categories or tags to display right now." 
+                    buttonLabel="Explore All Questions"
+                    buttonLink="/questions"
+                  />
                 )}
               </div>
             </div>

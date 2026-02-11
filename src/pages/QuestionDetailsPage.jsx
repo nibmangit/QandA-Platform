@@ -8,7 +8,8 @@ import AnswerItem from "../Components/AnswerItem";
 import RelatedSidebar from "../Components/RelatedSidebar";
 import DeleteModal from "../Components/DeleteModal";
 import LoadingPage from "./LoadingPage";
-import { MessageSquare } from "lucide-react";
+import { FileSearch, HelpCircle, MessageSquare } from "lucide-react";
+import EmptyState from "../Components/EmptyState";
 
 const QuestionDetailsPage = () => {
   const { id } = useParams();
@@ -77,8 +78,13 @@ const QuestionDetailsPage = () => {
 
   if (!question) return (
     <div className="p-20 text-center">
-      <h2 className="text-2xl font-bold text-red-500">Question not found</h2>
-      <button onClick={() => window.history.back()} className="mt-4 text-blue-600 underline">Go Back</button>
+      <EmptyState
+        icon={FileSearch}
+        title="Question Not Found"
+        message="The question you are looking for might have been deleted or moved. Check the main feed for more."
+        buttonLabel="Back to All Questions"
+        buttonLink="/questions"
+      />
     </div>
   );
 
@@ -113,9 +119,15 @@ const QuestionDetailsPage = () => {
               </div>
 
               {answers.length === 0 ? (
-                <div className="text-center py-10 bg-white dark:bg-[#1E293B] rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-                  <p className="text-gray-500">No answers yet. Be the first to help!</p>
-                </div>
+                <EmptyState 
+                  icon={HelpCircle}
+                  title="No Answers Yet"
+                  message="This question is still waiting for a hero. Do you have the answer?"
+                  buttonLabel="Be the First to Answer"
+                  // We use a button to scroll to the input instead of a Link
+                  showButton={true}
+                  buttonLink="#answer-input" 
+                />
               ) : (
                 answers.map((answer) => (
                   <AnswerItem 

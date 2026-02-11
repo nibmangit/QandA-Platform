@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { Bell, Search, Loader2 } from "lucide-react"; 
+import { Bell, Search, Loader2, Megaphone } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import { getAnnouncements } from "../api/announcementService";
+import EmptyState from "../Components/EmptyState";
 
 const AnnouncementsPage = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const AnnouncementsPage = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {announcements.map((ann, index) => (
+            {announcements?.map((ann, index) => (
               <div
                 key={ann.id}
                 className={`p-5 rounded-xl shadow-sm border-l-4 transition-all hover:translate-x-1 cursor-pointer
@@ -94,7 +95,12 @@ const AnnouncementsPage = () => {
             ))}
             
             {announcements.length === 0 && !loading && (
-              <p className="text-center py-10 text-gray-500">No announcements found.</p>
+              <EmptyState 
+                icon={Megaphone} 
+                title="Quiet for Now" 
+                message="There are no active announcements at the moment. Check back soon for updates from the faculty." 
+                showButton={false} 
+              />
             )}
           </div>
         )}

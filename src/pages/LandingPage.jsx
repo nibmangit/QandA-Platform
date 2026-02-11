@@ -1,4 +1,4 @@
-import { CornerUpRight, BookOpen, TrendingUp } from "lucide-react"; 
+import { CornerUpRight, BookOpen, TrendingUp, Megaphone } from "lucide-react"; 
 import AnnouncementBanner from "../Components/AnnouncementBanner"; 
 import QuestionCard from "../Components/QuestionCard";
 import { BDU, BDU_DARK } from "../utils/css";  
@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { getQuestions } from "../api/questionService";
 import {getAnnouncements} from "../api/announcementService"
 import LoadingPage from "./LoadingPage";
+import EmptyState from "../Components/EmptyState";
  
 
 const LandingPage = () => {
@@ -97,7 +98,15 @@ const LandingPage = () => {
 
       <div className="mb-12 space-y-4">
         <h3 className={`text-2xl font-bold mb-4 text-[${BDU.TEXT}] dark:text-[${BDU_DARK.TEXT}]`} >University Announcements</h3>
-        {latestNews.map((ann, index ) => (
+        { latestNews.length === 0 ? (
+          <EmptyState 
+            icon={Megaphone} 
+            title="No Recent Announcements" 
+            message="Everything is currently up to date. Check back later for campus news." 
+            showButton={false} 
+          /> 
+        ) : (
+        latestNews.map((ann, index ) => (
           <div
                 key={ann.id}
                 className={`p-5 rounded-xl shadow-sm border-l-4 transition-all hover:translate-x-1 cursor-pointer
@@ -122,7 +131,7 @@ const LandingPage = () => {
                   Read Full Notice <span className="ml-1">→</span>
                 </div>
               </div>
-        ))}        
+        )))}        
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> 
@@ -135,6 +144,14 @@ const LandingPage = () => {
             <div className="space-y-4">
                <LoadingPage message="Loading Trending Questions.." isFullPage={false} />
             </div>
+          ) : questions.length === 0 ? (
+            <EmptyState 
+              icon={TrendingUp} 
+              title="Nothing Trending Yet" 
+              message="The campus is quiet today! Be the first to start a trending discussion." 
+              buttonLabel="Ask a Question" 
+              buttonLink="/ask-question" 
+            />
           ) : (
             <>
               {questions.map(q => (
