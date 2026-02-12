@@ -8,12 +8,11 @@ import { useNotifications } from "../context/NotificationContext.jsx";
 import { useBookmarks } from "../context/BookmarkContext.jsx";
 
 const Header = () => {
-  const {unreadCount, notifications} = useNotifications();
+  const {unreadCount} = useNotifications();
   const {bookmarkCount} = useBookmarks();
   const { currentUser, isLoggedIn, openLogin, openRegister } = useAuth(); 
   const navigate = useNavigate();
-  const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme(); 
-  const messageCount = notifications.filter(n => !n.read && n.noti_type?.toLowerCase() === 'message').length;
+  const { theme, toggleTheme, MoonIcon, SunIcon } = useTheme();  
 
   return (
     <header
@@ -103,25 +102,7 @@ const Header = () => {
                     {bookmarkCount > 9 ? "9+" : bookmarkCount}
                   </span>
                 )}
-              </button>
-
-              {/* 3. Inbox (Specifically for Message Notifications) */}
-              <button
-                  onClick={() => navigate("/inbox")}
-                  className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#374151] bg-gray-100 dark:bg-[#1E293B] transition hover:cursor-pointer group"
-                  title="Inbox"
-                >
-                  <Mail size={24} className="text-[#1E293B] dark:text-[#F1F5F9] group-hover:text-amber-500 transition-colors" />
-                  
-                  {messageCount > 0 && (
-                    <span
-                      className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white ring-2 ring-white dark:ring-[#1A2A3A]"
-                      style={{ backgroundColor: BDU.GOLD }}
-                    >
-                      {messageCount > 9 ? "9+" : messageCount}
-                    </span>
-                  )}
-                </button>
+              </button> 
 
               {/* 4. Profile Avatar */}
               <div className="relative group pl-2">

@@ -10,6 +10,7 @@ import DeleteModal from "../Components/DeleteModal";
 import LoadingPage from "./LoadingPage";
 import { FileSearch, HelpCircle, MessageSquare } from "lucide-react";
 import EmptyState from "../Components/EmptyState";
+import DiscussionRoom from "../Components/Chat/DiscussionRoom";
 
 const QuestionDetailsPage = () => {
   const { id } = useParams();
@@ -31,7 +32,7 @@ const QuestionDetailsPage = () => {
     commentInputs, setCommentInputs, openCommentsFor, setOpenCommentsFor,
     handlePostAnswer, handleUpdateAnswer, handleDeleteAnswer, handlePostComment,
     handleToggleLike, handleToggleBookmark, handleDeleteQuestion
-  } = useQuestionDetails(id);   
+  } = useQuestionDetails(id);    
 
   const openDeleteQuestionModal = () => {
     setModalConfig({
@@ -186,6 +187,8 @@ const QuestionDetailsPage = () => {
         title={modalConfig.title}
         message={modalConfig.message}
       />
+
+      <DiscussionRoom questionId={question.id} currentUser={currentUser} />
     </div>
   );
 };

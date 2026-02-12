@@ -24,8 +24,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import NotFoundPage from './pages/NotFoundPage';
 import ReputationPage from "./pages/ReputationPage"; 
 import AnnouncementsPage from "./pages/AnnouncementsPage";
-import CategoryPage from "./pages/CategoryPage";
-import InboxPage from "./pages/InboxPage";
+import CategoryPage from "./pages/CategoryPage"; 
 import NotificationsPage from "./pages/NotificationsPage";
 import AnnouncementDetailPage from './pages/AnnouncementDetailPage ';
 import BookMarkPage from './pages/BookMarkPage';
@@ -45,8 +44,7 @@ const App = () => {
     { to: "/ask-question", label: "Ask Question", icon: PlusSquare, requiresAuth: true },
     { to: "/questions", label: "All Questions", icon: List },
     { to: "/categories", label: "Categories", icon: BookOpen },
-    { to: "/reputation", label: "Reputation", icon: Zap }, 
-    { to: "/inbox", label: "Inbox", icon: Mail, requiresAuth: true },
+    { to: "/reputation", label: "Reputation", icon: Zap },  
     { to: currentUser ? `/profile/${currentUser.id}` : "/", label: "My Profile", icon: User, requiresAuth: true },
     { to: "/dashboard", label: "Dashboard", icon: Shield, requiresAuth: true },
     { to: "/notifications", label: "Notifications", icon: Bell, requiresAuth: true },
@@ -56,7 +54,7 @@ const App = () => {
  
   const isFullScreenPage = location.pathname === "/notfound";
   const showHeader = !isFullScreenPage;
-  const showFooter = !isFullScreenPage && location.pathname !== "/inbox";
+  const showFooter = !isFullScreenPage 
 
   if (isLoading) {
     return <LoadingPage />;
@@ -97,8 +95,7 @@ const App = () => {
                 <Route path="/questions/:id" element={<ProtectedRoute><QuestionDetailsPage /></ProtectedRoute>} />
                 <Route path="/ask-question" element={<ProtectedRoute><AskQuestionPage mode='ask' /></ProtectedRoute>} />
                 <Route path="/edit-question/:questionId" element={<ProtectedRoute><AskQuestionPage mode='edit' /></ProtectedRoute>} />
-                <Route path="/profile/:userId" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
-                <Route path="/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
+                <Route path="/profile/:userId" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} /> 
                 <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
                 <Route path="/bookmarks" element={<ProtectedRoute><BookMarkPage /></ProtectedRoute>} />
 
