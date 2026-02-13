@@ -9,17 +9,30 @@
 
 
  @layer utilities {
+  /* This ensures the horizontal scrollbar for code is accessible */
   .custom-scrollbar::-webkit-scrollbar {
     width: 5px;
+    height: 5px; /* Added height for horizontal scrolling */
   }
+  
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: transparent;
     border-radius: 20px;
   }
+
+  /* Show on hover */
   .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1; /* slate-300 */
+    background-color: #cbd5e1;
   }
+  
   .dark .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-    background-color: #475569; /* slate-600 */
+    background-color: #475569;
+  }
+
+  /* Force the code block to scroll, bypassing 'prose' defaults */
+  .markdown-content pre {
+    overflow-x: auto !important;
+    white-space: pre !important;
+    word-wrap: normal !important;
   }
 }

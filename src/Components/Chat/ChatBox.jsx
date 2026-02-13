@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble';
 
-const ChatBox = ({ messages, currentUser, isOwner,socketRef }) => {
+const ChatBox = ({ messages, currentUser, isOwner, socketRef }) => {
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -11,6 +11,30 @@ const ChatBox = ({ messages, currentUser, isOwner,socketRef }) => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    /**
+     * Formats the date for the separator
+     * Returns "Today", "Yesterday", or the full date
+     */
+    const formatDateSeparator = (dateString) => {
+        const date = new Date(dateString);
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return "Today";
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return "Yesterday";
+        } else {
+            return date.toLocaleDateString([], { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+    };
 
     return (
         <div 
@@ -29,27 +53,48 @@ const ChatBox = ({ messages, currentUser, isOwner,socketRef }) => {
                 </div>
             ) : (
                 messages.map((msg, index) => {
-                    // IDENTITY CHECK:
-                    // We check if the message is from the current user by comparing
-                    // both ID (numeric) and username (which is the email in your case).
+                    // IDENTITY CHECK
                     const isMe = 
-                        (msg.user_id && msg.user_id === currentUser?.id) || 
+                        (msg.user_id && String(msg.user_id) === String(currentUser?.id)) || 
                         (msg.username && msg.username === currentUser?.username) ||
                         (msg.username && msg.username === currentUser?.email);
 
+                    // DATE SEPARATOR LOGIC
+                    const currentDate = new Date(msg.timestamp).toDateString();
+                    const previousDate = index > 0 
+                        ? new Date(messages[index - 1].timestamp).toDateString() 
+                        : null;
+                    const showDateSeparator = currentDate !== previousDate;
+
+                    const isSameUserAsPrevious = index > 0 && messages[index - 1].user_id === msg.user_id;
+                    const isGrouped = isSameUserAsPrevious && !showDateSeparator
+
                     return (
-                        <MessageBubble 
-                            key={msg.message_id || index} 
-                            msg={msg} 
-                            isMe={isMe}
-                            isRoomOwner={isOwner}
-                            socketRef={socketRef}
-                        />
+                        <React.Fragment key={msg.message_id || `temp-${index}`}>
+                            {showDateSeparator && (
+                                <div className="flex items-center my-6">
+                                    <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                                    <span className="px-4 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                                        {formatDateSeparator(msg.timestamp)}
+                                    </span>
+                                    <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                                </div>
+                            )}
+                            
+                            <MessageBubble 
+                                msg={msg} 
+                                isMe={isMe}
+                                isRoomOwner={isOwner}
+                                socketRef={socketRef}
+                                isGrouped={isGrouped}
+                            />
+                        </React.Fragment>
                     );
                 })
             )}
             
-            <div ref={messagesEndRef} />
+            {/* Invisible anchor for auto-scroll */}
+            <div ref={messagesEndRef} className="h-2" />
         </div>
     );
 };

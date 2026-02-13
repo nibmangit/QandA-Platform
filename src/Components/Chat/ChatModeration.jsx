@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import chatService from '../../api/chatService';
 import apiPrivate from '../../api/axiosPrivate';
 
-const ChatModeration = ({ questionId }) => {
+const ChatModeration = ({ questionId, socketRef }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -13,6 +13,7 @@ const ChatModeration = ({ questionId }) => {
             // Using a relative path to respect axiosPrivate baseURL
             // Removed leading slash to prevent URL doubling
             const res = await apiPrivate.get(`chat/requests/${questionId}/`);
+            console.log("Requests for question id: ", res.data)
             setRequests(res.data);
         } catch (err) {
             console.error("Could not load requests", err);
@@ -22,15 +23,34 @@ const ChatModeration = ({ questionId }) => {
     };
 
     useEffect(() => { 
-        if (isOpen && questionId) fetchRequests();
-    }, [isOpen, questionId]);
+        const socket = socketRef?.current;
+        if(!socket) return;
 
-    const handleAction = async (requestId, status) => {
+        const handleMessage = (e) => {
+            const data = JSON.parse(e.data);
+            if (data.type === 'new_access_request') {
+                // Refresh the list so the new requester appears
+                fetchRequests(); 
+                }
+            };
+        socket.addEventListener('message', handleMessage);
+        return () => socket.removeEventListener('message', handleMessage);
+
+    }, [isOpen, socketRef]);
+
+    const handleAction = async (requestId, status, userId) => {
         try {
             // This calls chatService.patch(`chat/handle-request/${requestId}/`, { status })
             await chatService.handleWriteRequest(requestId, status);
-            
-            // Remove the processed user from the local list immediately
+
+            if (socketRef.current) {
+                socketRef.current.send(JSON.stringify({
+                    type: 'update_request_status',
+                    user_id: userId, // The ID of the person who applied
+                    status: status === 'accepted' ? 'approved' : 'rejected'
+                }));
+            }
+             
             setRequests(prev => prev.filter(r => r.id !== requestId));
         } catch (err) {
             console.error("Action failed", err);
@@ -90,13 +110,13 @@ const ChatModeration = ({ questionId }) => {
                                             </div>
                                             <div className="flex gap-1.5">
                                                 <button 
-                                                    onClick={() => handleAction(req.id, 'accepted')}
+                                                    onClick={() => handleAction(req.id, 'accepted', req.user)}
                                                     className="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold rounded shadow-sm transition-colors"
                                                 >
                                                     Accept
                                                 </button>
                                                 <button 
-                                                    onClick={() => handleAction(req.id, 'rejected')}
+                                                    onClick={() => handleAction(req.id, 'rejected', req.user)}
                                                     className="px-2.5 py-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-[10px] rounded"
                                                 >
                                                     Deny
