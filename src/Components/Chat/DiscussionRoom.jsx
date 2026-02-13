@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import chatService from '../../api/chatService';
 import ChatBox from './ChatBox';
 import ChatInput from './ChatInput';
 import ChatModeration from './ChatModeration';
+import { useAuth } from '../../context/AuthContext';
 
-const DiscussionRoom = ({ questionId, currentUser }) => {
+const DiscussionRoom = ({ questionId }) => {
+    const {currentUser} = useAuth();
     const [messages, setMessages] = useState([]);
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [isBanned, setIsBanned] = useState(false);
@@ -14,6 +16,9 @@ const DiscussionRoom = ({ questionId, currentUser }) => {
     const [typingUsers, setTypingUsers] = useState({});
     const [onlineUsers, setOnlineUsers] = useState([]);
 
+    const [myLastSeenAtStart, setMyLastSeenAtStart] = useState(null);
+    const [othersLastSeenTime, setOthersLastSeenTime] = useState(null);
+
     useEffect(() => {
         if (!questionId) return;
 
@@ -22,12 +27,15 @@ const DiscussionRoom = ({ questionId, currentUser }) => {
                 const response = await chatService.getChatHistory(questionId);
                 const history = [...response.data.results].reverse();
                 
-                setMessages(history);
+                setMyLastSeenAtStart(response.data.last_seen_timestamp);
+                if (response.data.others_last_seen_timestamp) {
+                        setOthersLastSeenTime(response.data.others_last_seen_timestamp);
+                    }
                 
                 setIsAuthorized(response.data.user_can_write || response.data.is_owner);
                 setIsOwnerState(response.data.is_owner);
                 setIsBanned(response.data.is_banned || false);
-                console.log("Chat history response,", response.data);
+                setMessages(history); 
                 
                 connectWebSocket();
             } catch (err) {
@@ -120,6 +128,26 @@ const DiscussionRoom = ({ questionId, currentUser }) => {
                         console.log("Syncing online users:", userArray);
                         setOnlineUsers(userArray);
                         break;
+                    
+                    case 'reaction_broadcast':
+                        setMessages(prevMessages => 
+                            prevMessages.map(msg => 
+                                msg.message_id === data.message_id 
+                                    ? { ...msg, reactions: data.reactions } 
+                                    : msg
+                            )
+                        );
+                        break;
+                    
+                    case 'user_read_broadcast':
+                        console.log(`Live Update: User ${data.user_id} caught up at ${data.timestamp}`);
+                        if (String(data.user_id) !== String(currentUser?.id)) {
+                            setOthersLastSeenTime(data.timestamp);
+                        } else {
+                            console.log("Ignoring my own broadcast");
+                        }
+                    break;
+
                     default:
                         console.warn("Unknown socket type:", data.type);
                         break;
@@ -135,6 +163,12 @@ const DiscussionRoom = ({ questionId, currentUser }) => {
         return () => {
             if (socketRef.current) socketRef.current.close();
         };
+    }, [questionId, currentUser?.id]);
+
+    const markAsRead = useCallback(() => {
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({ type: 'mark_read' }));
+        }
     }, [questionId]);
 
     if (isBanned) {
@@ -172,7 +206,15 @@ const DiscussionRoom = ({ questionId, currentUser }) => {
                 {isOwnerState && <ChatModeration questionId={questionId} socketRef={socketRef} />}
             </div>
 
-            <ChatBox messages={messages} currentUser={currentUser} isOwner={isOwnerState} socketRef={socketRef} />
+            <ChatBox 
+                messages={messages} 
+                isOwner={isOwnerState} 
+                socketRef={socketRef} 
+                lastSeenTime={myLastSeenAtStart} 
+                othersLastSeenTime={othersLastSeenTime}
+                markAsRead={markAsRead}
+                />
+
 
             {/* Typing Indicator UI */}
                 <div className="h-6 px-4">

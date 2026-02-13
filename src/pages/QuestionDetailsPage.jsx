@@ -188,7 +188,7 @@ const QuestionDetailsPage = () => {
         message={modalConfig.message}
       />
 
-      <DiscussionRoom questionId={question.id} currentUser={currentUser} />
+      <DiscussionRoom questionId={question.id} />
     </div>
   );
 };
