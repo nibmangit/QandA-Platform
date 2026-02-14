@@ -8,7 +8,7 @@ import AnswerItem from "../Components/AnswerItem";
 import RelatedSidebar from "../Components/RelatedSidebar";
 import DeleteModal from "../Components/DeleteModal";
 import LoadingPage from "./LoadingPage";
-import { FileSearch, HelpCircle, MessageSquare } from "lucide-react";
+import { FileSearch, HelpCircle, MessageSquare, X, Minimize2 } from "lucide-react";
 import EmptyState from "../Components/EmptyState";
 import DiscussionRoom from "../Components/Chat/DiscussionRoom";
 
@@ -26,6 +26,7 @@ const QuestionDetailsPage = () => {
   });
 
   const [newAnswerText, setNewAnswerText] = useState("");
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const {
     question, answers, setAnswers, relatedQuestions, loading,
@@ -89,11 +90,12 @@ const QuestionDetailsPage = () => {
     </div>
   );
 
-  return (
-    <div className="bg-gray-50 dark:bg-[#0F172A] min-h-screen">
+return (
+    <div className="bg-gray-50 dark:bg-[#0F172A] min-h-screen relative">
       <div className="max-w-7xl mx-auto py-10 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
+          {/* Main Content */}
           <div className="lg:col-span-3 space-y-10">
             <QuestionCard 
               question={question} 
@@ -101,10 +103,10 @@ const QuestionDetailsPage = () => {
               showFullBody={true}
               onLike={(type, targetId, isLike) => handleToggleLike(type, targetId, isLike)}
               onBookmark={() => handleToggleBookmark(question.id)} 
-              // Updated to use the dynamic modal
               onDelete={openDeleteQuestionModal}
             />
 
+            {/* Answers Section */}
             <div className="space-y-6">
               <div ref={answersStartRef} className="flex items-center justify-between border-b dark:border-gray-800 pb-4">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -125,7 +127,6 @@ const QuestionDetailsPage = () => {
                   title="No Answers Yet"
                   message="This question is still waiting for a hero. Do you have the answer?"
                   buttonLabel="Be the First to Answer"
-                  // We use a button to scroll to the input instead of a Link
                   showButton={true}
                   buttonLink="#answer-input" 
                 />
@@ -141,7 +142,6 @@ const QuestionDetailsPage = () => {
                     onCommentInputChange={(val) => setCommentInputs({...commentInputs, [answer.id]: val})}
                     onPostComment={() => handlePostComment(answer.id)}
                     onUpdate={handleUpdateAnswer}
-                    // Updated to use the dynamic modal
                     onDelete={openDeleteAnswerModal}
                     onLikeToggle={handleToggleLike}
                     setAnswers={setAnswers} 
@@ -150,6 +150,7 @@ const QuestionDetailsPage = () => {
               )}
             </div>
 
+            {/* Post Answer Box */}
             <div ref={bottomRef} className="bg-white dark:bg-[#1E293B] p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
               <h3 className="text-xl font-bold mb-4 dark:text-white">Your Answer</h3>
               <textarea
@@ -173,13 +174,61 @@ const QuestionDetailsPage = () => {
             </div>
           </div>
 
+          {/* Sidebar */}
           <div className="lg:col-span-1">
             <RelatedSidebar questions={relatedQuestions} />
           </div>
         </div>
       </div>
 
-      {/* Dynamic Modal Implementation */}
+      {/* --- FLOATING CHAT WIDGET --- */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        
+        {/* Chat Window */}
+        {isChatOpen && (
+          <div className="mb-4 w-[380px] md:w-[420px] h-[550px] bg-white dark:bg-[#1E293B] shadow-2xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all duration-300 animate-in slide-in-from-bottom-5">
+            
+            {/* Widget Header */}
+            <div className="p-4 bg-[#0F172A] flex justify-between items-center text-white border-b border-gray-800">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="font-bold text-xs uppercase tracking-widest">Live Chat</span>
+              </div>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="p-1 hover:bg-gray-800 rounded-md transition-colors"
+              >
+                <Minimize2 size={18} />
+              </button>
+            </div>
+
+            {/* Chat Content */}
+            <div className="flex-1 overflow-hidden">
+              <DiscussionRoom questionId={question.id} />
+            </div>
+          </div>
+        )}
+
+        {/* Floating Toggle Button */}
+        <button
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className={`p-4 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 flex items-center justify-center ${
+            isChatOpen ? 'bg-red-500 rotate-90' : 'hover:scale-110'
+          }`}
+          style={{ backgroundColor: !isChatOpen ? BDU.ACCENT : undefined }}
+        >
+          {isChatOpen ? (
+            <X className="text-white" size={24} />
+          ) : (
+            <div className="relative">
+              <MessageSquare className="text-white" size={24} />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 border-2 border-[#0F172A] rounded-full"></span>
+            </div>
+          )}
+        </button>
+      </div>
+
+      {/* Modals */}
       <DeleteModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
@@ -187,8 +236,6 @@ const QuestionDetailsPage = () => {
         title={modalConfig.title}
         message={modalConfig.message}
       />
-
-      <DiscussionRoom questionId={question.id} />
     </div>
   );
 };

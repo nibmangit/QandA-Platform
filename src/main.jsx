@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { TopUserProvider } from './context/topUserContext.jsx';
 import { NotificationProvider } from './context/NotificationContext.jsx';
 import { BookmarkProvider } from './context/BookmarkContext.jsx';
+import { FeedbackProvider } from './context/FeedbackContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -16,13 +17,15 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider> 
         <TopUserProvider>
           <NotificationProvider>
+            <FeedbackProvider>
             <BookmarkProvider>
-        <ThemeProvider>
-          <QuestionProvider>
-            <App />
-          </QuestionProvider>
-        </ThemeProvider>
-        </BookmarkProvider>
+            <ThemeProvider>
+              <QuestionProvider>
+                <App />
+              </QuestionProvider>
+            </ThemeProvider>
+          </BookmarkProvider>
+          </FeedbackProvider>
         </NotificationProvider>
         </TopUserProvider>
       </AuthProvider>

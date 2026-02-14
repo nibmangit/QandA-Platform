@@ -4,9 +4,11 @@ import ChatBox from './ChatBox';
 import ChatInput from './ChatInput';
 import ChatModeration from './ChatModeration';
 import { useAuth } from '../../context/AuthContext';
+import { useFeedback } from '../../context/FeedbackContext';
 
 const DiscussionRoom = ({ questionId }) => {
     const {currentUser} = useAuth();
+    const { showToast } = useFeedback();
     const [messages, setMessages] = useState([]);
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [isBanned, setIsBanned] = useState(false);
@@ -37,6 +39,8 @@ const DiscussionRoom = ({ questionId }) => {
                 setIsBanned(response.data.is_banned || false);
                 setMessages(history); 
                 
+                console.log("Loaded chat history:", response.data);
+                
                 connectWebSocket();
             } catch (err) {
                 console.error("Failed to load chat:", err);
@@ -53,8 +57,7 @@ const DiscussionRoom = ({ questionId }) => {
             socketRef.current.onopen = () => setStatus('connected');
             
             socketRef.current.onmessage = (e) => {
-                const data = JSON.parse(e.data);
-                console.log("LIVE SIGNAL RECEIVED:", data);
+                const data = JSON.parse(e.data); 
                 
                 switch(data.type) {
                     case 'new_message':
@@ -64,8 +67,7 @@ const DiscussionRoom = ({ questionId }) => {
                         });
                         break;
 
-                    case 'delete_confirmation':
-                        console.log("UI: Removing message ID", data.message_id);
+                    case 'delete_confirmation': 
                         setMessages((prev) => {
                             const filtered = prev.filter(m => String(m.message_id) !== String(data.message_id));
                             console.log("Messages after delete:", filtered.length);
@@ -73,8 +75,7 @@ const DiscussionRoom = ({ questionId }) => {
                         });
                         break;
 
-                    case 'edit_confirmation':
-                        console.log("UI: Updating message ID", data.message_id);
+                    case 'edit_confirmation': 
                         setMessages((prev) => prev.map(m => 
                             String(m.message_id) === String(data.message_id) 
                                 ? { ...m, content: data.new_content } 
@@ -87,16 +88,14 @@ const DiscussionRoom = ({ questionId }) => {
                         // The red dot in ChatModeration handles this if you use the addEventListener approach
                         break;
 
-                    case 'access_status_update':
-                        console.log("Access update received:", data);
-                        // Important: check if the update is for ME (the current user)
+                    case 'access_status_update': 
                         if (String(currentUser?.id) === String(data.target_user_id)) {
                             if (data.status === 'approved') {
                                 setIsAuthorized(true);
-                                alert("Your request to join has been approved!");
+                                showToast("Your request to join has been approved!", "success");
                             } else {
                                 setIsAuthorized(false);
-                                alert("Your request to join was declined.");
+                                showToast("Your request to join was declined.", "error");
                             }
                         }
                         break;
@@ -118,14 +117,10 @@ const DiscussionRoom = ({ questionId }) => {
                         break;
                     
                     case 'presence_update':
-                        // data.users is an object: { "14": "fix_front", "15": "owner" }
-                        // We convert it to an array for our state
                         var userArray = Object.entries(data.users).map(([id, name]) => ({
                                     user_id: id,
                                     username: name
-                                }));
-                        
-                        console.log("Syncing online users:", userArray);
+                                })); 
                         setOnlineUsers(userArray);
                         break;
                     
@@ -139,15 +134,29 @@ const DiscussionRoom = ({ questionId }) => {
                         );
                         break;
                     
-                    case 'user_read_broadcast':
-                        console.log(`Live Update: User ${data.user_id} caught up at ${data.timestamp}`);
+                    case 'user_read_broadcast': 
                         if (String(data.user_id) !== String(currentUser?.id)) {
                             setOthersLastSeenTime(data.timestamp);
-                        } else {
-                            console.log("Ignoring my own broadcast");
-                        }
+                        } 
                     break;
 
+                    case 'user_banned_signal': 
+                        if (String(data.target_user_id) === String(currentUser?.id)) {
+                            setIsBanned(true);
+                            setIsAuthorized(false);
+                            showToast("You have been restricted from this room.", "error");
+                            if (socketRef.current) socketRef.current.close();
+                        }
+                        // 2. Remove the banned user from the online list for everyone else
+                        setOnlineUsers((prev) => prev.filter(u => String(u.user_id) !== String(data.target_user_id)));
+                        break;
+
+                    case 'user_unbanned_signal': 
+                        if (String(data.target_user_id) === String(currentUser?.id)) {
+                            setIsBanned(false);
+                            showToast("Your restriction has been lifted.", "success");
+                        }
+                        break;
                     default:
                         console.warn("Unknown socket type:", data.type);
                         break;
@@ -173,15 +182,21 @@ const DiscussionRoom = ({ questionId }) => {
 
     if (isBanned) {
         return (
-            <div className="p-4 border rounded-lg bg-red-50 text-red-600 text-sm italic">
-                You have been restricted from this discussion by the author.
+            <div className="flex flex-col items-center justify-center h-[500px] border rounded-lg bg-red-50 dark:bg-red-950/10 border-red-200 dark:border-red-900/30 p-8 text-center">
+                <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
+                    <span className="text-3xl">🚫</span>
+                </div>
+                <h3 className="text-lg font-black text-red-700 dark:text-red-400 uppercase tracking-tight">Access Restricted</h3>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 max-w-xs leading-relaxed">
+                    The author has restricted your access to this discussion. If you believe this is a mistake, please contact the author.
+                </p>
             </div>
         );
     }
 
     return (
         <div className="flex flex-col h-[500px] border rounded-lg overflow-hidden bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-            <div className="px-4 py-3 bg-navy-900 flex justify-between items-center text-white">
+            <div className="px-4 py-3 bg-navy-900 flex justify-between items-center text-white bg-gray-400">
 
                 <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${status === 'connected' ? 'bg-green-400' : 'bg-red-400'}`} />
@@ -191,7 +206,7 @@ const DiscussionRoom = ({ questionId }) => {
             <div className="flex items-center gap-3">
                 <div className="flex -space-x-2">
                     {onlineUsers.slice(0, 3).map(user => (
-                        <div key={user.user_id} className="w-6 h-6 rounded-full bg-navy-700 border-2 border-navy-900 flex items-center justify-center text-[10px] font-bold" title={user.username}>
+                        <div key={user.user_id} className="w-6 h-6 rounded-full bg-cyan-700 border-2 border-navy-900 flex items-center justify-center text-[10px] font-bold" title={user.username}>
                             {user.username.charAt(0).toUpperCase()}
                         </div>
                     ))}
@@ -201,7 +216,7 @@ const DiscussionRoom = ({ questionId }) => {
                         </div>
                     )}
                 </div>
-                <span className="text-[10px] text-gray-300">{onlineUsers.length} online</span>
+                <span className="text-[10px] text-green-900">{onlineUsers.length} online</span>
             </div>
                 {isOwnerState && <ChatModeration questionId={questionId} socketRef={socketRef} />}
             </div>
@@ -219,7 +234,7 @@ const DiscussionRoom = ({ questionId }) => {
             {/* Typing Indicator UI */}
                 <div className="h-6 px-4">
                     {Object.values(typingUsers).length > 0 && (
-                        <p className="text-[11px] text-gray-400 italic animate-pulse">
+                        <p className="text-[11px] text-green-400 italic animate-pulse">
                             {Object.values(typingUsers).join(', ')} {Object.values(typingUsers).length > 1 ? 'are' : 'is'} typing...
                         </p>
                     )}
