@@ -37,9 +37,7 @@ const DiscussionRoom = ({ questionId }) => {
                 setIsAuthorized(response.data.user_can_write || response.data.is_owner);
                 setIsOwnerState(response.data.is_owner);
                 setIsBanned(response.data.is_banned || false);
-                setMessages(history); 
-                
-                console.log("Loaded chat history:", response.data);
+                setMessages(history);  
                 
                 connectWebSocket();
             } catch (err) {
