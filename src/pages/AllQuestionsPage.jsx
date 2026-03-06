@@ -105,7 +105,7 @@ const SidebarContent = () => (
           >
             <span className="flex items-center gap-2">
               <span className="group-hover:scale-110 transition-transform duration-200">
-                {getCategoryEmoji(c.icon)}
+                {getCategoryEmoji(c.name)}
               </span> 
               {c.name}
             </span>

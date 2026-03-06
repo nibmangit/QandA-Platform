@@ -79,7 +79,7 @@ const CategoryPage = () => {
                   >
                     <div className="flex items-center space-x-4">
                       <span className="text-4xl transition-transform group-hover:scale-110">
-                        {getCategoryEmoji(cat.icon)}
+                        {getCategoryEmoji(cat.name)}
                       </span>
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">

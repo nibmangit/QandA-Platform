@@ -4,6 +4,7 @@ import TopContributors from "../Components/TopContributors";
 import { useEffect, useState } from "react";
 import { getAllBadges } from "../api/badgeService";
 import LoadingPage from "./LoadingPage";
+import EmptyState from "../Components/EmptyState";
   
 const ReputationPage = () => { 
   const [loading , setLoading] = useState(true);
@@ -60,7 +61,7 @@ const ReputationPage = () => {
               />
             ))} 
           </div>):(
-            <EmptyState 
+            <EmptyState
               icon={Award}
               title="No Badges Defined"
               message="The rewards system is currently being updated. Check back soon to see how you can earn reputation points!"

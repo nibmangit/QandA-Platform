@@ -48,7 +48,8 @@ const DiscussionRoom = ({ questionId }) => {
 
         const connectWebSocket = () => {
             const token = localStorage.getItem('accessToken');
-            const wsUrl = `ws://127.0.0.1:8000/ws/chat/${questionId}/?token=${token}`;
+            const WS_BASE_URL = import.meta.env.VITE_WS_URL;
+            const wsUrl = `${WS_BASE_URL}/${questionId}/?token=${token}`;
             
             socketRef.current = new WebSocket(wsUrl);
 

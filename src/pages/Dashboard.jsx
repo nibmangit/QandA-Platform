@@ -1,5 +1,4 @@
-import { PlusSquare, List, Mail, Settings, MessageSquare, ThumbsUp, Zap } from "lucide-react";
-import { MOCK_ANNOUNCEMENTS, MOCK_QUESTIONS } from "../utils/mock/mockData";
+import { PlusSquare, List, Mail, Settings, MessageSquare, ThumbsUp, Zap } from "lucide-react"; 
 import { BDU } from "../utils/css";
 import { formatScore } from "../utils/Find";
 import QuestionCard from "../Components/QuestionCard";
@@ -22,7 +21,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { questions, setQuestions, onLikeList, onDeleteList, onBookmarkList } = useQuestionActions([]);
   const [loading, setLoading] = useState(true);
-  const [latestNews, setLatestNews] = useState(null);
+  const [latestNews, setLatestNews] = useState([]);
   useEffect(() => {
     const fetchMyQuestions = async () => {
       try {

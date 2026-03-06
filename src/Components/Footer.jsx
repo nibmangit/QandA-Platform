@@ -1,9 +1,24 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { BDU } from "../utils/css";
-import { MOCK_CATEGORIES } from "../utils/mock/mockData";
+import { BDU } from "../utils/css"; 
+import { getCategories } from "../api/questionService";
 
 const Footer = () => { 
   const {isLoggedIn} = useAuth();
+  const [category, setCategory]= useState([])
+
+    useEffect(() => {
+    const fetchAllData = async () => {
+      try { 
+        const catData = await getCategories() 
+        setCategory(catData); 
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }  
+    };
+    fetchAllData();
+  }, []);
+
   return (
     <footer
       className="mt-12 py-10 border-t border-gray-200 min-w-0 lg:ml-64"
@@ -45,7 +60,7 @@ const Footer = () => {
               Popular Fields
             </h5>
             <ul className="space-y-2 text-sm">
-              {MOCK_CATEGORIES.slice(0, 4).map((c) => (
+              {category.slice(0, 4).map((c) => (
                 <li key={c.id}>
                   <a href={`/categories`} className="hover:text-gray-300">
                     {c.name}

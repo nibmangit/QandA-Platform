@@ -12,9 +12,9 @@ return(
     <div className={`flex items-start `}>
       <Bell size={24} className={`mr-3 mt-1 text-[${BDU.TEXT}] dark:text-[${BDU_DARK.TEXT}]`} />
       <div>
-        <h4 className={`font-bold text-[${BDU.NAVY}] dark:text-[${BDU_DARK.ACCENT}]`}>{announcement.title}</h4>
+        <h4 className={`font-bold text-[${BDU.NAVY}] dark:text-[${BDU_DARK.ACCENT}]`}>{announcement?.title}</h4>
         <p className={`text-sm mt-1 text-[${BDU.NAVY}] dark:text-[${BDU_DARK.TEXT}]`}>
-          {announcement.body} <span className="text-xs font-medium ml-2 whitespace-nowrap opacity-70">({announcement.date})</span>
+          {announcement?.body} <span className="text-xs font-medium ml-2 whitespace-nowrap opacity-70">({announcement?.date})</span>
         </p>
       </div>
     </div>
