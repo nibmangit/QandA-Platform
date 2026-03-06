@@ -103,7 +103,17 @@ return (
                 
                 {/* Floating Action Menu - Optimized for Mobile (Higher Z-Index) */}
                 {!isEditing && (
-                    <div className="flex items-center gap-0.5 opacity-0 md:group-hover:opacity-100 group-active:opacity-100 transition-all duration-200 bg-white dark:bg-[#1E293B] shadow-lg border border-gray-100 dark:border-gray-700 rounded-full px-1.5 py-0.5 z-30 transform scale-90 md:scale-100">
+                    <div className={`
+                                flex items-center gap-1 transition-all duration-200 
+                                bg-white dark:bg-[#1E293B] shadow-md border border-gray-100 dark:border-gray-700 
+                                rounded-lg p-1 scale-90 md:scale-100 z-30
+                                
+                                /* Desktop: Hide by default, show on hover */
+                                md:opacity-0 md:group-hover:opacity-100 
+                                
+                                /* Mobile: Always visible but slightly transparent until the parent is touched */
+                                opacity-70 group-active:opacity-100 
+                            `}>
                         <button onClick={() => setShowPicker(!showPicker)} className="p-1 hover:text-blue-500 text-gray-400 transition-colors cursor-pointer">
                             <Smile size={14} />
                         </button>
