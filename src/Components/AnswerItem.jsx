@@ -84,11 +84,21 @@ const AnswerItem = ({
     <div className="relative bg-white dark:bg-[#1E293B] p-6 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 transition-all">
       {/* Answer Actions */}
       {isOwner && !isEditing && (
-        <div className="absolute top-4 right-4 flex space-x-2">
-          <button onClick={() => setIsEditing(true)} className="text-yellow-500 hover:scale-110 transition-transform cursor-pointer"><Edit size={16} /></button>
-          <button onClick={() => onDelete(answer.id)} className="text-red-500 hover:scale-110 transition-transform cursor-pointer"><Trash2 size={16} /></button>
-        </div>
-      )}
+          <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/80 dark:bg-[#1E293B]/80 backdrop-blur-sm p-1 rounded-lg shadow-sm z-10 md:bg-transparent md:shadow-none">
+            <button 
+              onClick={() => setIsEditing(true)} 
+              className="p-2 text-yellow-500 hover:scale-110 active:scale-95 transition-all cursor-pointer"
+            >
+              <Edit size={18} /> {/* Increased size from 16 to 18 for mobile */}
+            </button>
+            <button 
+              onClick={() => onDelete(answer.id)} 
+              className="p-2 text-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+        )}
 
       {/* Answer Body/Edit */}
       {isEditing ? (
@@ -137,19 +147,19 @@ const AnswerItem = ({
                     <div className="flex items-center gap-2">
                         <span className="text-[10px] text-gray-400">{new Date(c.created_at).toLocaleTimeString()}</span>
                         {isCommentOwner && (
-                            <div className="hidden group-hover:flex items-center gap-2 transition-all">
-                                <button 
-                                    onClick={() => { setEditingCommentId(c.id); setEditCommentText(c.body); }} 
-                                    className="text-gray-400 hover:text-yellow-500 cursor-pointer"
-                                >
-                                    <Edit size={12} />
-                                </button>
-                                <button
-                                    onClick={() => openCommentDeleteModal(c.id)} 
-                                    className="text-gray-400 hover:text-red-500 cursor-pointer"
-                                >
-                                    <Trash2 size={12} />
-                                </button>
+                             <div className="flex items-center gap-3 transition-all md:opacity-0 md:group-hover:opacity-100">
+                              <button 
+                                onClick={() => { setEditingCommentId(c.id); setEditCommentText(c.body); }} 
+                                className="p-1 text-gray-400 hover:text-yellow-500 active:text-yellow-600 transition-colors cursor-pointer"
+                              >
+                                <Edit size={14} />
+                              </button>
+                              <button
+                                onClick={() => openCommentDeleteModal(c.id)} 
+                                className="p-1 text-gray-400 hover:text-red-500 active:text-red-600 transition-colors cursor-pointer"
+                              >
+                                <Trash2 size={14} />
+                              </button>
                             </div>
                         )}
                     </div>
@@ -177,18 +187,18 @@ const AnswerItem = ({
             )}
           </div>
           
-          <div className="flex gap-2 pt-2">
-            <input 
-              type="text" 
-              className="flex-1 p-2 border rounded-lg text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
-              placeholder="Write a comment..."
-              value={commentInput || ""}
+          <div className="flex gap-2 pt-3 border-t dark:border-gray-800">
+          <input 
+            type="text" 
+            className="flex-1 p-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-[#0F172A] dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            placeholder="Write a comment..."
+            value={commentInput || ""}
               onChange={(e) => onCommentInputChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && onPostComment(answer.id)}
             />
             <button 
                 onClick={() => onPostComment(answer.id)} 
-                className="bg-blue-600 text-white px-4 py-1 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md shadow-blue-500/20 transition-all"
             >
                 Post
             </button>
