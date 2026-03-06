@@ -118,7 +118,7 @@ const ChatInput = ({ socketRef, isAuthorized, questionId, status }) => {
                     <button
                         onClick={handleRequestAccess}
                         disabled={isSubmitting}
-                        className="w-full py-2.5 px-4 bg-navy-900 hover:bg-navy-800 text-white rounded-xl text-sm font-bold shadow-lg transition-all disabled:opacity-50 active:scale-95"
+                        className="w-full py-2.5 px-4 bg-navy-900 hover:bg-navy-800 dark:text-white rounded-xl text-sm font-bold shadow-lg transition-all disabled:opacity-50 active:scale-95"
                     >
                         {isSubmitting ? "Processing..." : "Join Discussion (Request Access)"}
                     </button>
