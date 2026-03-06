@@ -22,6 +22,8 @@ const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
+  console.log("Profile User", profileUser)
+
   useEffect(() => {
     const fetchUser = async () => {
       let targetId = (userId && userId !== "undefined") ? userId : currentUser?.id;

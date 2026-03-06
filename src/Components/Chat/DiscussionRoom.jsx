@@ -193,58 +193,66 @@ const DiscussionRoom = ({ questionId }) => {
         );
     }
 
-    return (
-        <div className="flex flex-col h-[500px] border rounded-lg overflow-hidden bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-            <div className="px-4 py-3 bg-navy-900 flex justify-between items-center text-white bg-gray-400">
-
+return (
+        /* Changed fixed height to a more responsive range and added min-h-0 for internal flex children */
+        <div className="flex flex-col h-[550px] md:h-[650px] lg:h-[700px] border rounded-lg overflow-hidden bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 transition-all shadow-sm">
+            
+            {/* Header: Uses flex-wrap for small screens */}
+            <div className="px-3 py-2 md:px-4 md:py-3 bg-gray-100 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-800 flex flex-wrap justify-between items-center gap-2">
                 <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${status === 'connected' ? 'bg-green-400' : 'bg-red-400'}`} />
-                    <h3 className="text-sm font-bold uppercase tracking-wider">Discussion Room</h3>
+                    <div className={`w-2 h-2 rounded-full ${status === 'connected' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                    <h3 className="text-xs md:text-sm font-bold uppercase tracking-wider dark:text-gray-200">Discussion Room</h3>
                 </div>
-                {/* Inside the Header div of DiscussionRoom.jsx */}
-            <div className="flex items-center gap-3">
-                <div className="flex -space-x-2">
-                    {onlineUsers.slice(0, 3).map(user => (
-                        <div key={user.user_id} className="w-6 h-6 rounded-full bg-cyan-700 border-2 border-navy-900 flex items-center justify-center text-[10px] font-bold" title={user.username}>
-                            {user.username.charAt(0).toUpperCase()}
-                        </div>
-                    ))}
-                    {onlineUsers.length > 3 && (
-                        <div className="w-6 h-6 rounded-full bg-gray-600 border-2 border-navy-900 flex items-center justify-center text-[10px]">
-                            +{onlineUsers.length - 3}
-                        </div>
-                    )}
+
+                <div className="flex items-center gap-3 ml-auto sm:ml-0">
+                    <div className="flex -space-x-2">
+                        {onlineUsers.slice(0, 3).map(user => (
+                            <div key={user.user_id} className="w-6 h-6 rounded-full bg-blue-600 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-bold text-white" title={user.username}>
+                                {user.username.charAt(0).toUpperCase()}
+                            </div>
+                        ))}
+                        {onlineUsers.length > 3 && (
+                            <div className="w-6 h-6 rounded-full bg-gray-500 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] text-white">
+                                +{onlineUsers.length - 3}
+                            </div>
+                        )}
+                    </div>
+                    <span className="hidden xs:inline text-[10px] font-medium text-green-600 dark:text-green-400">{onlineUsers.length} online</span>
+                    {isOwnerState && <ChatModeration questionId={questionId} socketRef={socketRef} />}
                 </div>
-                <span className="text-[10px] text-green-900">{onlineUsers.length} online</span>
-            </div>
-                {isOwnerState && <ChatModeration questionId={questionId} socketRef={socketRef} />}
             </div>
 
-            <ChatBox 
-                messages={messages} 
-                isOwner={isOwnerState} 
-                socketRef={socketRef} 
-                lastSeenTime={myLastSeenAtStart} 
-                othersLastSeenTime={othersLastSeenTime}
-                markAsRead={markAsRead}
+            {/* Chat Content: min-h-0 is crucial for flex-grow to work inside overflow containers */}
+            <div className="flex-1 min-h-0 relative">
+                <ChatBox 
+                    messages={messages} 
+                    isOwner={isOwnerState} 
+                    socketRef={socketRef} 
+                    lastSeenTime={myLastSeenAtStart} 
+                    othersLastSeenTime={othersLastSeenTime}
+                    markAsRead={markAsRead}
                 />
+            </div>
 
+            {/* Typing Indicator: Absolute or fixed height to prevent layout jumps */}
+            <div className="h-5 px-4 flex items-center bg-transparent">
+                {Object.values(typingUsers).length > 0 && (
+                    <p className="text-[10px] md:text-[11px] text-green-500 italic animate-pulse">
+                        {Object.values(typingUsers).slice(0, 2).join(', ')} 
+                        {Object.values(typingUsers).length > 2 ? ` and ${Object.values(typingUsers).length - 2} others` : ''} 
+                        {Object.values(typingUsers).length > 1 ? ' are' : ' is'} typing...
+                    </p>
+                )}
+            </div>
 
-            {/* Typing Indicator UI */}
-                <div className="h-6 px-4">
-                    {Object.values(typingUsers).length > 0 && (
-                        <p className="text-[11px] text-green-400 italic animate-pulse">
-                            {Object.values(typingUsers).join(', ')} {Object.values(typingUsers).length > 1 ? 'are' : 'is'} typing...
-                        </p>
-                    )}
-                </div>
-
-            <ChatInput 
-                socketRef={socketRef} 
-                isAuthorized={isAuthorized} 
-                questionId={questionId} 
-                status={status} 
-            />
+            <div className="p-2 md:p-3 border-t border-gray-100 dark:border-gray-800">
+                <ChatInput 
+                    socketRef={socketRef} 
+                    isAuthorized={isAuthorized} 
+                    questionId={questionId} 
+                    status={status} 
+                />
+            </div>
         </div>
     );
 };
