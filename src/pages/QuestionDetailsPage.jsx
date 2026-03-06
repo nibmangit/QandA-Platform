@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useQuestionDetails } from "../hooks/useQuestionDetails";
@@ -34,6 +34,15 @@ const QuestionDetailsPage = () => {
     handlePostAnswer, handleUpdateAnswer, handleDeleteAnswer, handlePostComment,
     handleToggleLike, handleToggleBookmark, handleDeleteQuestion
   } = useQuestionDetails(id);    
+
+    useEffect(() => {
+    if (isChatOpen && window.innerWidth < 768) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isChatOpen]);
 
   const openDeleteQuestionModal = () => {
     setModalConfig({
@@ -186,47 +195,59 @@ return (
         
         {/* Chat Window */}
         {isChatOpen && (
-          <div className="mb-4 w-[380px] md:w-[420px] h-[550px] bg-white dark:bg-[#1E293B] shadow-2xl rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all duration-300 animate-in slide-in-from-bottom-5">
+          <div className="
+              /* Mobile: Full screen or nearly full screen */
+              fixed bottom-0 right-0 w-full h-[100dvh] 
+              /* Desktop: Fixed size floating in the corner */
+              md:absolute md:bottom-full md:mb-4 md:w-[420px] md:h-[600px] 
+              bg-white dark:bg-[#1E293B] shadow-2xl md:rounded-2xl 
+              border border-gray-200 dark:border-gray-700 
+              overflow-hidden flex flex-col transition-all duration-300 
+              z-[60] animate-in slide-in-from-bottom-5
+            ">
             
             {/* Widget Header */}
             <div className="p-4 bg-[#0F172A] flex justify-between items-center text-white border-b border-gray-800">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="font-bold text-xs uppercase tracking-widest">Live Chat</span>
-              </div>
-              <button 
-                onClick={() => setIsChatOpen(false)}
-                className="p-1 hover:bg-gray-800 rounded-md transition-colors"
-              >
-                <Minimize2 size={18} />
-              </button>
-            </div>
-
-            {/* Chat Content */}
-            <div className="flex-1 overflow-hidden">
-              <DiscussionRoom questionId={question.id} />
-            </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="font-bold text-[10px] md:text-xs uppercase tracking-widest">Discussion Room</span>
           </div>
-        )}
+          <div className="flex items-center gap-2">
+            {/* On mobile, an "X" or "Close" is more intuitive than "Minimize" */}
+            <button 
+              onClick={() => setIsChatOpen(false)}
+              className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+            >
+              <X size={20} className="md:hidden" />
+              <Minimize2 size={18} className="hidden md:block" />
+            </button>
+          </div>
+        </div>
+                {/* Chat Content */}
+                <div className="flex-1 overflow-hidden">
+                  <DiscussionRoom questionId={question.id} />
+                </div>
+              </div>
+            )}
 
-        {/* Floating Toggle Button */}
-        <button
-          onClick={() => setIsChatOpen(!isChatOpen)}
-          className={`p-4 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 flex items-center justify-center ${
-            isChatOpen ? 'bg-red-500 rotate-90' : 'hover:scale-110'
-          }`}
-          style={{ backgroundColor: !isChatOpen ? BDU.ACCENT : undefined }}
-        >
-          {isChatOpen ? (
-            <X className="text-white" size={24} />
-          ) : (
-            <div className="relative">
-              <MessageSquare className="text-white" size={24} />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 border-2 border-[#0F172A] rounded-full"></span>
-            </div>
-          )}
-        </button>
-      </div>
+            {/* Floating Toggle Button */}
+            <button
+              onClick={() => setIsChatOpen(!isChatOpen)}
+              className={`p-4 rounded-full shadow-2xl transition-all duration-300 transform active:scale-90 flex items-center justify-center ${
+                isChatOpen ? 'bg-red-500 rotate-90' : 'hover:scale-110'
+              }`}
+              style={{ backgroundColor: !isChatOpen ? BDU.ACCENT : undefined }}
+            >
+              {isChatOpen ? (
+                <X className="text-white" size={24} />
+              ) : (
+                <div className="relative">
+                  <MessageSquare className="text-white" size={24} />
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 border-2 border-[#0F172A] rounded-full"></span>
+                </div>
+              )}
+            </button>
+          </div>
 
       {/* Modals */}
       <DeleteModal 

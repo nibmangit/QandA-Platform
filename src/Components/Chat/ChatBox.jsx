@@ -66,84 +66,82 @@ useEffect(() => {
         }
     };
 
-    return (
+   return (
         <div 
-            ref={scrollContainerRef}
-            className={`flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-gray-50 dark:bg-gray-800/50 scrollbar-thin transition-opacity duration-300 ${
+            ref={scrollContainerRef} 
+            className={`flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-5 flex flex-col gap-1 md:gap-2 bg-gray-50 dark:bg-[#0F172A] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 transition-opacity duration-500 min-h-0 ${
                 isReady ? 'opacity-100' : 'opacity-0'
             }`}
         >
             {messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full opacity-50">
-                    <div className="p-3 rounded-full bg-gray-200 dark:bg-gray-700 mb-2">
-                        <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                /* Empty State: Centered and subtle */
+                <div className="flex flex-col items-center justify-center h-full animate-pulse">
+                    <div className="p-4 rounded-full bg-gray-200 dark:bg-gray-800/50 mb-3">
+                        <svg className="w-8 h-8 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                     </div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Start the discussion...
+                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                        Room is quiet...
                     </p>
                 </div>
             ) : (
                 messages.map((msg, index) => {
-                    // IDENTITY CHECK
                     const isMe = 
                         (msg.user_id && String(msg.user_id) === String(currentUser?.id)) || 
-                        (msg.username && msg.username === currentUser?.username) ||
-                        (msg.username && msg.username === currentUser?.email);
+                        (msg.username && msg.username === currentUser?.username);
                     
-                    //New SEEN LOGIC
                     const msgTime = new Date(msg.timestamp).getTime();
                     const othersTime = othersLastSeenTime ? new Date(othersLastSeenTime).getTime() : 0;
                     const hasBeenSeenByOthers = isMe && othersTime >= msgTime;
 
-                    const isNewToMe = lastSeenTime && new Date(msg.timestamp) > new Date(lastSeenTime);
-                    const isFirstNew = isNewToMe && (index === 0 || new Date(messages[index-1].timestamp) <= new Date(lastSeenTime));
-                    // DATE SEPARATOR LOGIC
                     const currentDate = new Date(msg.timestamp).toDateString();
-                    const previousDate = index > 0 
-                        ? new Date(messages[index - 1].timestamp).toDateString() 
-                        : null;
+                    const previousDate = index > 0 ? new Date(messages[index - 1].timestamp).toDateString() : null;
                     const showDateSeparator = currentDate !== previousDate;
 
                     const isSameUserAsPrevious = index > 0 && messages[index - 1].user_id === msg.user_id;
-                    const isGrouped = isSameUserAsPrevious && !showDateSeparator
+                    const isGrouped = isSameUserAsPrevious && !showDateSeparator;
 
                     return (
                         <React.Fragment key={msg.message_id || `temp-${index}`}>
+                            {/* --- DATE SEPARATOR --- */}
                             {showDateSeparator && (
-                                <div className="flex items-center my-6">
-                                    <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-                                    <span className="px-4 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
+                                <div className="flex items-center my-6 px-4">
+                                    <div className="flex-grow border-t border-gray-200 dark:border-gray-800/50"></div>
+                                    <span className="px-3 text-[9px] md:text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] whitespace-nowrap">
                                         {formatDateSeparator(msg.timestamp)}
                                     </span>
-                                    <div className="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                                    <div className="flex-grow border-t border-gray-200 dark:border-gray-800/50"></div>
                                 </div>
                             )}
 
-                            {isFirstNew && !isMe && (
-                                <div ref={lastReadMarkerRef} className="flex items-center my-4">
-                                    <div className="flex-grow border-t border-red-400 opacity-50"></div>
-                                    <span className="px-3 text-[10px] font-bold text-red-500 uppercase tracking-widest">
-                                        New Messages Since Last Visit
+                            {/* --- NEW MESSAGES MARKER --- */}
+                            {/* (Calculated isFirstNew logic goes here) */}
+                            { (lastSeenTime && new Date(msg.timestamp) > new Date(lastSeenTime) && (index === 0 || new Date(messages[index-1].timestamp) <= new Date(lastSeenTime))) && !isMe && (
+                                <div ref={lastReadMarkerRef} className="flex items-center my-4 group">
+                                    <div className="flex-grow border-t border-red-500/30"></div>
+                                    <span className="px-3 py-1 bg-red-50 dark:bg-red-950/20 rounded-full text-[9px] font-bold text-red-500 uppercase tracking-widest border border-red-100 dark:border-red-900/30">
+                                        New Messages
                                     </span>
-                                    <div className="flex-grow border-t border-red-400 opacity-50"></div>
+                                    <div className="flex-grow border-t border-red-500/30"></div>
                                 </div>
                             )}
                             
-                            <MessageBubble 
-                                msg={msg} 
-                                isMe={isMe}
-                                isRoomOwner={isOwner}
-                                socketRef={socketRef}
-                                isGrouped={isGrouped}
-                                isSeen={hasBeenSeenByOthers}
-                            />
+                            {/* --- THE BUBBLE --- */}
+                            <div className={`${isGrouped ? 'mt-0.5' : 'mt-3'}`}>
+                                <MessageBubble 
+                                    msg={msg} 
+                                    isMe={isMe}
+                                    isRoomOwner={isOwner}
+                                    socketRef={socketRef}
+                                    isGrouped={isGrouped}
+                                    isSeen={hasBeenSeenByOthers}
+                                />
+                            </div>
                         </React.Fragment>
                     );
                 })
             )}
-             
         </div>
     );
 };
