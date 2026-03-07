@@ -1,17 +1,81 @@
-# React + Vite
+# Full Stack Q&A Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern **Question and Answer platform** that allows users to ask questions, share knowledge, and interact with the community. The project is built with a **React frontend** and a **Django REST Framework backend**, providing a scalable and responsive full-stack application.
 
-Currently, two official plugins are available:
+## 🚀 Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This platform enables users to post questions, write answers, and interact with other users. Each question has its own **discussion chat room**, allowing users to communicate and discuss the topic related to that specific question.
 
-## React Compiler
+The system includes authentication, question management, answers, engagement features, chat rooms, notifications, and user profiles.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Features
 
-## Expanding the ESLint configuration
+### 🔐 Authentication
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-update to see the deployments
+* User registration and login
+* JWT-based authentication
+* Secure protected endpoints
+
+### ❓ Questions & Answers
+
+* Create and browse questions
+* Add answers to questions
+* Categorized questions with tags
+* Question detail pages with answer threads
+
+### 💬 Question Chat Rooms
+
+* Each question has its own **chat room**
+* Users can discuss the question topic in real time
+* Conversation history is stored
+
+### 👍 Engagement System
+
+* Like / dislike questions and answers
+* Community interaction features
+
+### 👤 User Profiles
+
+* View user information
+* User points and badges
+* User activity tracking
+
+### 🔔 Notifications
+
+* Notifications for user activities such as new answers or interactions
+* Notifications are fetched from the backend (not real-time)
+
+### 📱 Responsive Design
+
+* Works on desktop and mobile devices
+* Dark mode friendly interface
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+* React
+* React Router
+* Axios
+* Vite
+
+### Backend
+
+* Django
+* Django REST Framework
+* JWT Authentication
+
+### Database
+
+* SQLite (development)
+* Easily extendable to PostgreSQL for production
+
+## 📚 What I Learned
+
+While building this project I improved my knowledge of:
+
+* Full-stack application architecture
+* REST API design
+* Authentication systems (JWT)
+* Frontend and backend integration
+* Designing scalable backend APIs
