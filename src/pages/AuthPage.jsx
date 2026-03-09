@@ -69,6 +69,12 @@ const AuthPage = ({ isOpen, onClose, isRegister, setIsRegister }) => {
     }
   };
 
+  const handleForgotPasswordClick = () => {
+  setError("");
+  setEmail(""); 
+  onClose();
+};
+
   return ( 
     <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"> 
       <div className="relative flex flex-col md:flex-row w-full max-w-5xl bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
@@ -145,6 +151,7 @@ const AuthPage = ({ isOpen, onClose, isRegister, setIsRegister }) => {
             <div className="text-right text-sm">
               <Link
                 to="/forgot-password" 
+                onClick={handleForgotPasswordClick}
                 className="hover:underline text-blue-600 dark:text-blue-400 font-medium"
               >
                 Forgot Password?
