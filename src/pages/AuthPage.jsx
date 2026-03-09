@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from 'react-router-dom';
 import { BookOpen, Loader2, X } from "lucide-react";
 import { BDU } from "../utils/css"; 
 import { useAuth } from "../context/AuthContext";  
@@ -141,12 +142,15 @@ const AuthPage = ({ isOpen, onClose, isRegister, setIsRegister }) => {
             {error && <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>}
 
             {!isRegister && (
-              <div className="text-right text-sm">
-                <button type="button" className="hover:underline text-blue-600 dark:text-blue-400 cursor-pointer">
-                  Forgot Password?
-                </button>
-              </div>
-            )}
+            <div className="text-right text-sm">
+              <Link
+                to="/forgot-password" 
+                className="hover:underline text-blue-600 dark:text-blue-400 font-medium"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+          )}
 
             <button
               type="submit"

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { 
   Home as HomeIcon, PlusSquare, BookOpen, HelpCircle, Zap, Shield, User,
   List, Bell, Mail 
@@ -28,12 +28,25 @@ import CategoryPage from "./pages/CategoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AnnouncementDetailPage from './pages/AnnouncementDetailPage ';
 import BookMarkPage from './pages/BookMarkPage';
+import ForgotPassword from './pages/ForgotPassword';
 import HelpPage from './pages/HelpPage';
+import ResetPassword from './pages/ResetPassword';
 
 const App = () => { 
   const location = useLocation();
-  const { currentUser, isLoggedIn, isLoading, isAuthOpen, closeAuth,  isRegisterMode, setIsRegisterMode } = useAuth();
+  const navigate = useNavigate();
+  const { currentUser, isLoggedIn, isLoading, isAuthOpen,openLogin, closeAuth,  isRegisterMode, setIsRegisterMode } = useAuth();
  
+  useEffect(() => {
+    // Check if we just arrived from the ResetPassword page
+    if (location.state?.triggerLogin) { 
+      openLogin();
+
+      // 2. Clean the URL state so it doesn't pop up again if they refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, openLogin, navigate]);
+
   useEffect(() => {
     const currentTitle = getTitleForPath(location.pathname);
     document.title = currentTitle;
@@ -52,9 +65,11 @@ const App = () => {
     { to: "/help", label: "Help", icon: HelpCircle }, 
   ].filter(item => !item.requiresAuth || isLoggedIn);
  
-  const isFullScreenPage = location.pathname === "/notfound";
+  const fullScreenPaths = ["/notfound", "/forgot-password", "/reset-password"];
+  const isFullScreenPage = fullScreenPaths.some(path => location.pathname.startsWith(path));
+
   const showHeader = !isFullScreenPage;
-  const showFooter = !isFullScreenPage 
+  const showFooter = !isFullScreenPage;
 
   if (isLoading) {
     return <LoadingPage />;
@@ -75,6 +90,8 @@ const App = () => {
         {isFullScreenPage ? (
           <Routes>
             <Route path="/notfound" element={<NotFoundPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
             <Route path="*" element={<Navigate to="/notfound" replace />} />
           </Routes>
         ) : (
