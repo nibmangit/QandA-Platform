@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser, registerUser, getProfile } from "../api/authService";
+import { googleLoginApi } from "../api/authService";
 
 const AuthContext = createContext();
 
@@ -107,6 +108,32 @@ export const AuthProvider = ({ children }) => {
   localStorage.setItem("currentUser", JSON.stringify(updatedUser));
 };
 
+//login with google
+const loginWithGoogle = async (googleToken) => {
+  setError("");
+  try {
+    // 1. Send Google token to Django
+    const data = await googleLoginApi(googleToken); 
+    
+    if (!data.access || !data.refresh) {
+      throw { detail: "Google Login failed: no tokens returned" };
+    }
+ 
+    localStorage.setItem("accessToken", data.access);
+    localStorage.setItem("refreshToken", data.refresh); 
+ 
+    const fullUser = await getProfile();
+    localStorage.setItem("currentUser", JSON.stringify(fullUser));
+    
+    setCurrentUser(fullUser);
+    setIsLoggedIn(true);
+    return true;
+  } catch (err) {
+    console.error("Google Login Error:", err);
+    setError("Google login failed. Please try again.");
+    return false;
+  }
+};
 
   return (
     <AuthContext.Provider
@@ -126,6 +153,7 @@ export const AuthProvider = ({ children }) => {
         openLogin,
         openRegister,
         closeAuth,
+        loginWithGoogle,
       }}
     >
       {children}

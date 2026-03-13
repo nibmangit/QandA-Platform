@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Loader2, X } from "lucide-react";
 import { BDU } from "../utils/css"; 
 import { useAuth } from "../context/AuthContext";  
+import { GoogleLogin } from "@react-oauth/google";
 
 const AuthPage = ({ isOpen, onClose, isRegister, setIsRegister }) => {
-  const { login, register, error, setError } = useAuth(); 
+  const { login, register, loginWithGoogle, error, setError } = useAuth(); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -193,6 +194,48 @@ const AuthPage = ({ isOpen, onClose, isRegister, setIsRegister }) => {
               {isRegister ? "Login" : "Register"}
             </button>
           </p>
+
+          <div className="mt-6">
+  <div className="relative flex items-center justify-center mb-4">
+    <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+    <span className="flex-shrink mx-4 text-gray-400 text-sm font-medium">OR</span>
+    <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+  </div>
+
+  <div className="w-full"> 
+    <div className="block dark:hidden">
+      <GoogleLogin
+        onSuccess={async (credentialResponse) => {
+          setIsLoading(true);
+          const success = await loginWithGoogle(credentialResponse.credential);
+          if (success) onClose();
+          setIsLoading(false);
+        }}
+        onError={() => setError("Google Login Failed")}
+        theme="outline"
+        size="large"
+        text="continue_with"
+        shape="rectangular" 
+      />
+    </div>
+ 
+    <div className="hidden dark:block">
+      <GoogleLogin
+        onSuccess={async (credentialResponse) => {
+          setIsLoading(true);
+          const success = await loginWithGoogle(credentialResponse.credential);
+          if (success) onClose();
+          setIsLoading(false);
+        }}
+        onError={() => setError("Google Login Failed")}
+        theme="filled_black"
+        size="large"
+        text="continue_with"
+        shape="rectangular" 
+      />
+    </div>
+  </div>
+</div>
 
           {/* Decorative background blur circles */}
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-yellow-400 opacity-20 blur-3xl pointer-events-none"></div>
