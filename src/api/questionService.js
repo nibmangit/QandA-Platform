@@ -25,7 +25,10 @@ export const getQuestions = async (params = {}) => {
   try {
     const token = localStorage.getItem("accessToken");
     const api = token ? apiPrivate : apiPublic;
-    const response = await api.get("/questions/questions/", { params });
+
+    const targetUrl = params?.url ? params.url : "/questions/questions/";
+    const config = params?.url ? {} : { params };
+    const response = await api.get(targetUrl, config);
     return response.data;
   } catch (error) {
     console.error("Error fetching questions:", error);
