@@ -132,7 +132,7 @@ const SidebarContent = () => (
 );
 
   return ( 
-    <div className="max-w-7xl mx-auto px-4 h-screen flex flex-col relative overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 flex flex-col relative">
       <div className="shrink-0 pt-6">
         <Search />
       </div>
@@ -152,9 +152,9 @@ const SidebarContent = () => (
       {loading ? (
         <LoadingPage message="Loading Questions..." isFullPage={false} />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full overflow-hidden pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-6">
            
-          <div className="lg:col-span-8 overflow-y-auto pr-2 custom-scrollbar space-y-6 pb-20">
+          <div className="lg:col-span-8 pr-2 space-y-6 pb-20">
             {filteredQuestions.length > 0 && (
               <div className="sticky top-0 z-10 flex items-center gap-2 p-2 bg-white/80 dark:bg-[#1A2A3A]/80 backdrop-blur-md rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
                 <span className="text-sm font-semibold px-2 text-gray-500">Sort:</span>
@@ -206,7 +206,7 @@ const SidebarContent = () => (
             )}
           </div>
  
-          <div className="hidden lg:block lg:col-span-4 overflow-y-auto pr-1 pb-10 custom-scrollbar">
+          <div className="hidden lg:block lg:col-span-4 pr-1 pb-10">
             <SidebarContent />
           </div>
         </div>
