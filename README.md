@@ -14,4 +14,4 @@ A modern Question and Answer platform frontend built with **React**, connecting 
 - React, React Router, Axios, Vite
 
 ## 🔗 Related
-- Backend Repository: [link to your backend repo]
+- Backend Repository: https://github.com/nibmangit/Q-A-backend
