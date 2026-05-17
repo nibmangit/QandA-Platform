@@ -21,6 +21,7 @@ const UserProfilePage = () => {
   const [userBadges, setUserBadges] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [activityLoading, setActivityLoading] = useState(true);
 
   console.log("Profile User", profileUser)
 
@@ -45,6 +46,7 @@ const UserProfilePage = () => {
   useEffect(() => {
     if (!profileUser) return;
     const fetchData = async () => {
+      setActivityLoading(true);
       try {
         const [qRes, aRes, allBadges] = await Promise.allSettled([
           apiPrivate.get(`/questions/questions/?author=${profileUser.email}`),
@@ -64,12 +66,18 @@ const UserProfilePage = () => {
           const userBadgeIds = (profileUser.badges || []).map(b => typeof b === 'object' ? b.id : b);
           setUserBadges(allBadges.value.filter(b => userBadgeIds.includes(b.id)));
         }
-      } catch (err) { console.error("Activity Error:", err); }
+      } catch (err) { 
+        console.error("Activity Error:", err); 
+      } finally {
+        setActivityLoading(false);
+      }
     };
     fetchData();
   }, [profileUser]);
 
-  if (authLoading || isDataLoading || !profileUser) return <LoadingPage />;
+  if (authLoading || isDataLoading) {
+  return <LoadingPage message="Loading profile..." isFullPage={false} />;
+}
 
   const isOwnProfile = currentUser?.id === profileUser.id;
 
@@ -153,6 +161,12 @@ const UserProfilePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         
         {/* COLUMN: QUESTIONS */}
+        {activityLoading ? (
+          <div className="col-span-2 flex justify-center py-10">
+            <LoadingPage message="Loading activity..." isFullPage={false} />
+          </div>
+        ) : ( 
+      <>
         <div className="space-y-6">
           <h3 className="text-xl font-black dark:text-white flex items-center gap-3 px-2">
             <div className="p-2 bg-blue-500 rounded-lg text-white"><BookOpen size={18}/></div>
@@ -230,6 +244,8 @@ const UserProfilePage = () => {
             )}
           </div>
         </div>
+      </>
+        )}
       </div>
 
       {isEditing && (
